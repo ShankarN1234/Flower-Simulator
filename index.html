@@ -48,7 +48,7 @@ button:hover{transform:translateY(-2px) scale(1.03)}
 button:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .ghost{background:var(--chip);color:var(--ink);box-shadow:none;border:2px solid transparent}
 .stack{display:grid;gap:8px;margin:12px 0 4px}.stack button{width:100%}
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 0}.row3 button{padding:11px 4px;font-size:.88rem}
+.row3{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 0}.row3 button{padding:11px 4px;font-size:.88rem}
 .hint{margin-top:12px;font-size:.78rem;color:var(--muted);font-weight:600}
 .modes{display:flex;gap:8px;margin:0 0 10px}
 .mb{flex:1;font:600 .92rem Fredoka,Nunito,sans-serif;padding:9px 6px;border-radius:14px;color:var(--ink);background:var(--chip);box-shadow:none;border:2px solid transparent}
@@ -69,6 +69,9 @@ details.how summary{cursor:pointer;font-weight:800}
 .sw{width:30px;height:30px;border-radius:50%;flex:none}.pips{color:var(--accent);letter-spacing:2px;font-size:.8rem}
 .sm{padding:8px 14px;font-size:.82rem;flex:none}
 .note2{color:var(--muted);font-size:.76rem;font-weight:600;margin:8px 0}
+.row2{display:flex;gap:8px;margin-bottom:10px}
+.inp{flex:1;min-width:0;font:600 1rem Fredoka,Nunito,sans-serif;padding:10px 14px;border-radius:14px;border:2px solid var(--chip);background:var(--chip);color:var(--ink);text-align:center}
+input{user-select:text;-webkit-user-select:text}
 </style>
 </head>
 <body>
@@ -80,10 +83,10 @@ var keys={},$=function(i){return document.getElementById(i)};
 function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v&&typeof v==="object"?Object.assign({},d,v):d}catch(e){return d}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var M={easy:{sp:1.1,hz:1.5,cut:.1,w:1.15},medium:{sp:1.5,hz:1,cut:.15,w:.9},hard:{sp:1.95,hz:.65,cut:.22,w:.7}};
-var CFG=load("bloom-cfg",{mode:"medium",two:0,snd:1,mus:1,rm:0,cb:0,shield:1,pu:1,thirst:1,seas:1,giant:1,combo:1,slow:1,tut:1,same:1,sab:1,hcap:0});
+var CFG=load("bloom-cfg",{mode:"medium",two:0,snd:1,mus:1,rm:0,cb:0,shield:1,pu:1,thirst:1,seas:1,giant:1,combo:1,slow:1,tut:1,same:1,sab:1,hcap:0,kind:"inf"});
 if(!M[CFG.mode])CFG.mode="medium";
-var SV=load("bloom-save",{seeds:0,own:{poppy:1},sel:"poppy",up:{},best:{},daily:{}});
-SV.own=Object.assign({poppy:1},SV.own);SV.up=Object.assign({petal:0,reach:0,shield:0,roots:0},SV.up);SV.best=SV.best||{};SV.daily=SV.daily||{};
+var SV=load("bloom-save",{seeds:0,own:{poppy:1},sel:"poppy",up:{},best:{},daily:{},mapOwn:{meadow:1},map:"meadow",lv:{},lb:{},name:"Player"});
+SV.own=Object.assign({poppy:1},SV.own);SV.up=Object.assign({petal:0,reach:0,shield:0,roots:0},SV.up);SV.best=SV.best||{};SV.daily=SV.daily||{};SV.mapOwn=Object.assign({meadow:1},SV.mapOwn);SV.lv=SV.lv||{};SV.lb=SV.lb||{};SV.name=SV.name||"Player";SV.map=SV.mapOwn[SV.map]?SV.map:"meadow";
 var SEEN=load("bloom-seen",{});
 function saveCfg(){store("bloom-cfg",CFG)}function saveSv(){store("bloom-save",SV)}
 var FL={
@@ -91,12 +94,35 @@ poppy:{n:"Poppy",c:["#ff7fa8","#ff5c8f"],ctr:["#ffe680","#f5a524"],lv:3,gr:1,cos
 daisy:{n:"Daisy",c:["#ffffff","#e3e9ff"],ctr:["#ffe680","#f5b800"],lv:2,gr:1.2,cost:40,d:"Grows 20% faster, but only 2 petals"},
 sun:{n:"Sunflower",c:["#ffd23f","#ffb300"],ctr:["#8a5a2b","#5a3a1c"],fc:"#ffeab5",lv:4,gr:.9,cost:90,d:"Tough: 4 petals, grows 10% slower"},
 rose:{n:"Rose",c:["#e63946","#c1121f"],ctr:["#ff9aa2","#e63946"],lv:3,gr:1,sh:.6,cost:130,d:"Thorns: shield recharges 40% faster"},
-orchid:{n:"Orchid",c:["#c77dff","#9d4edd"],ctr:["#fff3b0","#f5a524"],lv:3,gr:1,mag:1,cost:170,d:"Gently pulls pickups toward you"}};
+orchid:{n:"Orchid",c:["#c77dff","#9d4edd"],ctr:["#fff3b0","#f5a524"],lv:3,gr:1,mag:1,cost:170,d:"Gently pulls pickups toward you"},
+tulip:{n:"Tulip",c:["#ff9f43","#ff7a1a"],ctr:["#ffe9a8","#ffcf5a"],lv:3,gr:1,bm:1.3,cost:210,d:"Pickups boost you 30% more"},
+lotus:{n:"Lotus",c:["#ffd1e8","#ffb3d9"],ctr:["#fff3b0","#ffd166"],lv:3,gr:1,th:.5,cost:250,d:"Thirst drains twice as slowly"},
+cactus:{n:"Cactus Bloom",c:["#ff6fa1","#ff3d86"],ctr:["#9bd37a","#4aa564"],lv:3,gr:1,nf:1,cost:290,d:"Frost can’t slow you down"},
+lavender:{n:"Lavender",c:["#b79cf2","#8e6fd8"],ctr:["#ffe9a8","#f5c542"],lv:3,gr:1,wx:1.25,cost:340,d:"Warnings last 25% longer"},
+moon:{n:"Moonflower",c:["#eceeff","#c9ceff"],ctr:["#fff7b0","#ffe066"],lv:3,gr:1,sb:1.25,cost:400,d:"Earn 25% more seeds"}};
 var UP={
 petal:{n:"Extra petal",max:2,cost:function(l){return 100*(l+1)},d:"+1 petal per level"},
 reach:{n:"Pickup reach",max:3,cost:function(l){return 60*(l+1)},d:"Wider range for grabbing pickups"},
 shield:{n:"Quick shield",max:3,cost:function(l){return 70*(l+1)},d:"Leaf shield recharges 12% faster"},
 roots:{n:"Deep roots",max:3,cost:function(l){return 80*(l+1)},d:"+5% growth speed per level"}};
+var MAPS={
+meadow:{n:"Meadow",cost:0,d:"The classic garden",tint:null,hill:[[150,214,170],[102,196,128]],grass:"#5cbf6a",soil:["#7a5238","#4a3022"],mod:{}},
+desert:{n:"Dusty Oasis",cost:120,d:"Thirstier, but more sunlight",tint:"rgba(255,170,70,.18)",hill:[[232,192,122],[217,164,90]],grass:"#c9a24d",soil:["#c98b52","#8f5a33"],mod:{th:1.5,sun:.35}},
+forest:{n:"Rainforest",cost:200,d:"Frequent storms and tangled vines",tint:"rgba(40,140,90,.2)",hill:[[79,155,107],[47,125,79]],grass:"#2f9e55",soil:["#5a3d2b","#33231a"],mod:{st:.6,vn:.6}},
+mountain:{n:"Frosty Peaks",cost:300,d:"Gusty winds and lots of frost",tint:"rgba(140,170,230,.2)",hill:[[185,196,214],[141,155,181]],grass:"#dfe8f2",soil:["#6e6a78","#3e3b47"],mod:{wd:2,fz:.5}},
+night:{n:"Moonlit Garden",cost:420,d:"Starry night and faster growth",tint:"rgba(20,15,70,.45)",hill:[[58,74,122],[42,53,96]],grass:"#3f8f78",soil:["#3a2a40","#1e1426"],mod:{gr:1.1}}};
+Object.keys(MAPS).forEach(function(k){MAPS[k].key=k});
+var LEVELS=[
+{n:"Sprout Meadow",tgt:60,map:"meadow",haz:["snip"]},
+{n:"Storm Season",tgt:100,map:"meadow",haz:["snip","storm"]},
+{n:"Bird Watch",tgt:140,map:"meadow",haz:["snip","bird"]},
+{n:"Thorny Path",tgt:180,map:"forest",haz:["bird","vine"]},
+{n:"Dusty Oasis",tgt:230,map:"desert",haz:["snip","bird","storm","frost"]},
+{n:"Rainforest Rush",tgt:280,map:"forest",haz:["snip","bird","storm","vine"]},
+{n:"Frosty Peaks",tgt:340,map:"mountain",haz:["snip","bird","storm","vine","frost"]},
+{n:"Moonlit Finale",tgt:420,map:"night",haz:["snip","bird","storm","vine","frost","giant"]}];
+function cl(s){return String(s==null?"":s).replace(/[^A-Za-z0-9 _.-]/g,"").slice(0,14)||"Player"}
+function addScore(b,cm){if(cm<1)return 0;var l=(SV.lb[b]||[]).slice(),e={n:cl(SV.name),c:cm,d:Date.now()};l.push(e);l.sort(function(a,z){return z.c-a.c||a.d-z.d});SV.lb[b]=l.slice(0,10);return SV.lb[b].indexOf(e)+1}
 var SEAS=[{n:"Spring",i:"🌸",t:[126,205,255],b:[255,236,210]},{n:"Summer",i:"☀️",t:[60,165,255],b:[255,228,150]},{n:"Autumn",i:"🍂",t:[236,150,100],b:[255,214,170]},{n:"Winter",i:"❄️",t:[140,160,210],b:[228,238,252]}];
 function lerp(a,b,t){return a+(b-a)*t}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -123,6 +149,7 @@ $("pane1").innerHTML=PANE;$("pane2").innerHTML=PANE;
 function Game(root,onEnd){
 var cv=root.querySelector("canvas"),g=cv.getContext("2d"),W=0,H=0,D=1,vr=Math.random,rnd=seeded(1),mode="medium",label="",best=0,S,nb=false,lastcm="",paused=false,opp=null,o={},P={F:FL.poppy,gr:1,sh:1,reach:0,lv:3};
 var ctl={l:["arrowleft","a"],r:["arrowright","d"],s:["arrowup"," ","w"]};
+var MP=MAPS.meadow,mp={},LV=null,MM=M.medium,rk=0;
 var q=function(c){return root.querySelector(c)},eH=q(".hh"),eR=q(".rank"),eB=q(".boost"),eW=q(".thirst"),eWW=q(".thw"),eT=q(".best"),eO=q(".out"),eN=q(".toast"),eC=q(".cmb"),eS=q(".shb"),eP=root.querySelectorAll(".pet");
 function size(){D=Math.min(window.devicePixelRatio||1,2);W=root.clientWidth;H=root.clientHeight;cv.width=W*D;cv.height=H*D;g.setTransform(D,0,0,D,0,0)}
 function reset(){var mx=Math.min(7,P.lv+(o.hc?1:0));S={on:false,dead:false,t:0,h:0,top:0,x:W/2,tx:W/2,xs:[W/2],lives:mx,max:mx,inv:0,boost:0,storm:0,sm:0,stormT:16,wind:0,ltT:0,garT:6,pkT:1,ev:[],pk:[],pt:[],ft:[],flash:0,shake:0,frost:0,hl:[],hailT:0,birdT:9,vineT:12,fT:7,vn:[],fz:[],thirst:1,combo:0,comboT:0,shT:0,shCd:0,shMax:1,umb:0,lady:0,mag:0,gold:0,gdT:22,giT:20,slow:0,sn:0,ban:null,nt:0,pc:0,seeds:0}}
@@ -138,9 +165,9 @@ function burst(x,hp,c,n){n=CFG.rm?Math.ceil(n/3):n;for(var i=0;i<n;i++)S.pt.push
 function near(){if(!CFG.combo)return;S.boost=Math.min(S.boost+.8,10);S.pc++;ftxt("Near miss!");sfx("near");if(CFG.slow&&!CFG.rm)S.slow=.4}
 function doShield(){if(!CFG.shield||!S.on||paused||S.shCd>0)return;S.shT=.9;S.shMax=S.shCd=4.2*P.sh;sfx("shield")}
 function pick(p){var t=p.ty;p.got=true;
-if(t==="w"){S.boost=Math.min(S.boost+1.6,10);S.thirst=Math.min(1,S.thirst+.28)}
-else if(t==="s"){S.boost=Math.min(S.boost+4,10);S.thirst=Math.min(1,S.thirst+.1)}
-else if(t==="f"){S.boost=Math.min(S.boost+6,10);S.thirst=Math.min(1,S.thirst+.2);ftxt("Fertilizer!");hint("pu","🧪 Power-ups: fertilizer, ☂️ umbrella, 🐞 ladybug, 🧲 magnet.")}
+if(t==="w"){S.boost=Math.min(S.boost+1.6*P.bm,10);S.thirst=Math.min(1,S.thirst+.28)}
+else if(t==="s"){S.boost=Math.min(S.boost+4*P.bm,10);S.thirst=Math.min(1,S.thirst+.1)}
+else if(t==="f"){S.boost=Math.min(S.boost+6*P.bm,10);S.thirst=Math.min(1,S.thirst+.2);ftxt("Fertilizer!");hint("pu","🧪 Power-ups: fertilizer, ☂️ umbrella, 🐞 ladybug, 🧲 magnet.")}
 else if(t==="u"){S.umb=7;ftxt("Umbrella!")}
 else if(t==="l"){S.lady=Math.min(S.lady+1,2);ftxt("Ladybug guard!")}
 else{S.mag=9;ftxt("Magnet!")}
@@ -155,13 +182,15 @@ S.lives--;S.inv=1.8;S.flash=CFG.rm?0:Math.max(S.flash,.6);S.shake=CFG.rm?0:.5;S.
 burst(S.x,S.h,"#ff7fa8",22);
 S.h=Math.max(0,S.h*(1-M[mode].cut));S.xs.length=Math.max(1,Math.floor(S.h/4));
 if(S.lives<=0){S.on=false;S.dead=true;var cm=Math.floor(S.top/8),bs=o.daily?SV.daily:SV.best,key=o.daily?dkey():mode;
-nb=cm>(bs[key]||0);if(nb)bs[key]=cm;best=bs[key]||0;
-S.seeds=o.two?0:Math.floor(cm/6)+S.pc;SV.seeds+=S.seeds;saveSv();sfx("over");
+if(!o.lvl){nb=cm>(bs[key]||0);if(nb)bs[key]=cm;best=bs[key]||0}
+S.seeds=o.two||o.lvl?0:Math.floor((Math.floor(cm/6)+S.pc)*P.sb);SV.seeds+=S.seeds;if(!o.two&&!o.lvl)rk=addScore(o.daily?"daily-"+dkey():"inf-"+mode,cm);saveSv();sfx("over");
 eO.innerHTML="🥀 Wilted at "+cm+" cm"+(o.two?"<br><small>waiting for the other flower…</small>":"");eO.style.display="block";
 setTimeout(onEnd,900)}
 }
+function win(){S.on=false;S.won=true;var st=S.lives>=S.max?3:S.lives>=Math.ceil(S.max/2)?2:1,first=!(SV.lv[o.lvl]>0);S.stars=st;S.seeds=Math.floor((LV.tgt/5+S.pc)*P.sb*(first?1:.4));SV.seeds+=S.seeds;if(st>(SV.lv[o.lvl]||0))SV.lv[o.lvl]=st;saveSv();sfx("pu");eO.innerHTML="🌸 Level complete!";eO.style.display="block";setTimeout(onEnd,900)}
+function hzOn(k){return !LV||LV.haz.indexOf(k)>-1}
 function update(dt){
-var m=M[mode],rdt=dt;
+var m=MM,rdt=dt;
 if(S.slow>0){S.slow-=rdt;dt*=.35}
 S.t+=dt;S.sm=lerp(S.sm,S.storm>0?1:0,Math.min(1,dt*1.5));
 if(S.flash>0)S.flash-=dt*2.2;if(S.shake>0)S.shake-=dt;if(S.inv>0)S.inv-=dt;
@@ -177,29 +206,29 @@ if(CFG.shield&&S.t>15)hint("shield","🍃 Press Space or tap the leaf for a quic
 S.shT-=dt;S.shCd-=dt;S.boost-=dt;S.frost-=dt;S.umb-=dt;S.mag-=dt;S.gold-=dt;S.comboT-=dt;if(S.comboT<=0)S.combo=0;
 var cm=S.h/8,sn=!CFG.seas?0:cm<60?0:cm<140?1:cm<240?2:3;
 if(sn!==S.sn){S.sn=sn;if(sn>0){ban(SEAS[sn].i+" "+SEAS[sn].n);sfx("season")}}
-if(CFG.thirst){S.thirst=Math.max(0,S.thirst-dt*.026*(sn===1?1.3:1));if(S.thirst<.3)hint("thirst","Thirsty! Catch 💧 or your growth slows.")}else S.thirst=1;
-S.h+=(30+Math.min(S.h/60,30)+(S.boost>0?55:0))*(S.frost>0?.5:1)*m.sp*P.gr*(S.thirst<=0?.55:1)*(CFG.combo?1+Math.min(S.combo,8)*.05:1)*(sn===3?.92:1)*dt;
-S.top=Math.max(S.top,S.h);
+if(CFG.thirst){S.thirst=Math.max(0,S.thirst-dt*.026*(sn===1?1.3:1)*P.th*(mp.th||1));if(S.thirst<.3)hint("thirst","Thirsty! Catch 💧 or your growth slows.")}else S.thirst=1;
+S.h+=(30+Math.min(S.h/60,30)+(S.boost>0?55:0))*(S.frost>0&&!P.nf?.5:1)*m.sp*P.gr*(mp.gr||1)*(S.thirst<=0?.55:1)*(CFG.combo?1+Math.min(S.combo,8)*.05:1)*(sn===3?.92:1)*dt;
+S.top=Math.max(S.top,S.h);if(LV&&S.h>=LV.tgt*8){win();return}
 while(S.xs.length*4<=S.h)S.xs.push(S.x);
 var hz=m.hz,calm=S.gold>0,hd=calm?0:dt;
 S.gdT-=dt;if(CFG.giant&&S.gdT<=0&&S.h>480&&S.gold<=0){S.gdT=40+rnd()*15;S.gold=10;S.storm=0;ban("☀️ Golden hour!")}
 if(S.storm>0){S.hailT-=dt;if(S.hailT<=0){S.hailT=.45*hz;S.hl.push({x:clamp(S.x+(rnd()-.5)*420,20,W-20),hp:S.h+H*.62+30});hint("hail","🧊 Hail! Slip sideways.")}
 S.storm-=dt;S.wind=Math.sin(S.t*1.4)*120+Math.sin(S.t*.5)*60;S.ltT-=dt;
 if(S.ltT<=0){S.ltT=2.2*hz;S.ev.push({k:"bolt",tx:clamp(S.x+(rnd()-.5)*260,40,W-40),t:0,dur:1.1*m.w,id:rnd()*99,r:32});hint("bolt","⚡ Lightning marks its line first. Step aside.")}
-if(S.storm<=0)S.stormT=(12+rnd()*8)*hz*(sn===1?.7:1)}
-else{S.wind=lerp(S.wind,sn===2?Math.sin(S.t*.9)*50:0,Math.min(1,dt*3));S.stormT-=hd;if(S.stormT<=0&&S.h>80&&!calm){S.storm=9;S.ltT=1.5}}
-S.x=clamp(S.x+(S.tx-S.x)*Math.min(1,dt*9)+(S.umb>0?0:S.wind)*dt,34,W-34);
-S.garT-=hd;if(S.garT<=0&&S.h>60){S.garT=(Math.max(2,6-S.h/350)+rnd()*2)*hz;S.ev.push({k:"snip",tx:S.x,t:0,dur:1.5*m.w,r:48});hint("snip","✂️ A gardener! Leave the "+(CFG.cb?"blue":"red")+" ring before it snaps.")}
-S.birdT-=hd;if(S.birdT<=0&&S.h>120){S.birdT=(7+rnd()*4)*hz;S.ev.push({k:"bird",tx:S.x+(rnd()-.5)*60,t:0,dur:1.2*m.w,dir:rnd()<.5?-1:1,r:42});hint("bird","🐦 A bird is diving. Dodge its target.")}
-S.vineT-=hd;if(S.vineT<=0&&S.h>200){S.vineT=(9+rnd()*5)*hz;S.vn.push({hp:S.h+H*.62+40,gx:W*.2+rnd()*W*.6,ph:rnd()*6,gw:Math.max(120,190-S.h/20)*(mode==="easy"?1.25:1)});hint("vine","🌿 Thorn vines: grow through the gap.")}
-S.fT-=hd;if(S.fT<=0&&S.h>100){S.fT=(8+rnd()*4)*hz*(sn===3?.5:1);S.fz.push({x:rnd()*W,hp:S.h+H*.62+40,vx:(rnd()<.5?-1:1)*(30+rnd()*40)});hint("frost","❄️ Frost slows you. Steer around it.")}
-S.giT-=hd;if(CFG.giant&&S.giT<=0&&S.h>800){S.giT=(26+rnd()*10)*hz;S.ev.push({k:"giant",tx:S.x,t:0,dur:2.2*m.w,r:Math.min(150,W*.3)});hint("giant","⚠️ Giant gardener! Run far from the ring.")}
+if(S.storm<=0)S.stormT=(12+rnd()*8)*hz*(sn===1?.7:1)*(mp.st||1)}
+else{S.wind=lerp(S.wind,sn===2?Math.sin(S.t*.9)*50:0,Math.min(1,dt*3));S.stormT-=hd;if(S.stormT<=0&&S.h>80&&!calm&&hzOn("storm")){S.storm=9;S.ltT=1.5}}
+S.x=clamp(S.x+(S.tx-S.x)*Math.min(1,dt*9)+(S.umb>0?0:S.wind*(mp.wd||1))*dt,34,W-34);
+S.garT-=hd;if(S.garT<=0&&S.h>60&&hzOn("snip")){S.garT=(Math.max(2,6-S.h/350)+rnd()*2)*hz;S.ev.push({k:"snip",tx:S.x,t:0,dur:1.5*m.w,r:48});hint("snip","✂️ A gardener! Leave the "+(CFG.cb?"blue":"red")+" ring before it snaps.")}
+S.birdT-=hd;if(S.birdT<=0&&S.h>120&&hzOn("bird")){S.birdT=(7+rnd()*4)*hz;S.ev.push({k:"bird",tx:S.x+(rnd()-.5)*60,t:0,dur:1.2*m.w,dir:rnd()<.5?-1:1,r:42});hint("bird","🐦 A bird is diving. Dodge its target.")}
+S.vineT-=hd;if(S.vineT<=0&&S.h>200&&hzOn("vine")){S.vineT=(9+rnd()*5)*hz*(mp.vn||1);S.vn.push({hp:S.h+H*.62+40,gx:W*.2+rnd()*W*.6,ph:rnd()*6,gw:Math.max(120,190-S.h/20)*(mode==="easy"?1.25:1)});hint("vine","🌿 Thorn vines: grow through the gap.")}
+S.fT-=hd;if(S.fT<=0&&S.h>100&&hzOn("frost")){S.fT=(8+rnd()*4)*hz*(sn===3?.5:1)*(mp.fz||1);S.fz.push({x:rnd()*W,hp:S.h+H*.62+40,vx:(rnd()<.5?-1:1)*(30+rnd()*40)});hint("frost","❄️ Frost slows you. Steer around it.")}
+S.giT-=hd;if(CFG.giant&&S.giT<=0&&S.h>800&&hzOn("giant")){S.giT=(26+rnd()*10)*hz;S.ev.push({k:"giant",tx:S.x,t:0,dur:2.2*m.w,r:Math.min(150,W*.3)});hint("giant","⚠️ Giant gardener! Run far from the ring.")}
 S.ev.forEach(function(e){e.t+=dt;
 if(!e.done&&e.t>=e.dur){e.done=true;if(e.k==="bolt"){S.flash=CFG.rm?.2:.9;S.shake=CFG.rm?0:.35;sfx("bolt")}else sfx("snip");
 var dx=Math.abs(S.x-e.tx);if(dx<e.r)hit(e.k);else if(dx<e.r+55)near()}});
 S.ev=S.ev.filter(function(e){return e.t<e.dur+.45});
 S.pkT-=dt;
-if(S.pkT<=0){S.pkT=(.6+rnd()*.4)*(S.gold>0?.5:1)/(P.F.mag?1.35:1);var ty=CFG.pu&&rnd()<.14?["f","u","l","m"][Math.floor(rnd()*4)]:((S.gold>0?rnd()<.7:rnd()<.2)?"s":"w");S.pk.push({x:clamp(S.x+(rnd()-.5)*340,30,W-30),hp:S.h+H*.62+30,ty:ty})}
+if(S.pkT<=0){S.pkT=(.6+rnd()*.4)*(S.gold>0?.5:1)/(P.F.mag?1.35:1);var ty=CFG.pu&&rnd()<.14?["f","u","l","m"][Math.floor(rnd()*4)]:((S.gold>0?rnd()<.7:rnd()<.2+(mp.sun||0))?"s":"w");S.pk.push({x:clamp(S.x+(rnd()-.5)*340,30,W-30),hp:S.h+H*.62+30,ty:ty})}
 var rr=34+P.reach*8,mr=S.mag>0?170:P.F.mag?90:0;
 S.pk.forEach(function(p){p.hp-=(({w:80,s:45})[p.ty]||60)*m.sp*dt;
 if(mr&&!p.got){var dx=S.x-p.x,dy=S.h-p.hp,dd=Math.hypot(dx,dy);if(dd<mr&&dd>1){var k=Math.min(1,300*dt/dd);p.x+=dx*k;p.hp+=dy*k}}
@@ -230,6 +259,10 @@ g.fillStyle=fc;g.beginPath();g.arc(-r*.28,-r*.12,r*.1,0,6.283);g.arc(r*.28,-r*.1
 g.strokeStyle=fc;g.lineWidth=2;g.beginPath();
 if(danger)g.arc(0,r*.28,r*.12,0,6.283);else g.arc(0,r*.08,r*.3,.2,2.94);
 g.stroke();g.restore()}
+function deco(gy){var k=MP.key,i,x;
+if(k==="desert"){g.fillStyle="#4f9a52";for(i=0;i<3;i++){x=W*(.15+i*.35);g.fillRect(x-7,gy-62,14,64);g.fillRect(x-22,gy-44,10,8);g.fillRect(x-22,gy-58,8,22);g.fillRect(x+12,gy-34,10,8);g.fillRect(x+16,gy-50,8,24)}}
+else if(k==="forest"){g.fillStyle="rgba(38,92,58,.9)";for(i=0;i<4;i++){x=W*(.08+i*.28);g.fillRect(x-11,gy-300,22,310);g.beginPath();g.arc(x,gy-300,46,0,6.283);g.fill()}}
+else if(k==="mountain"){for(i=0;i<4;i++){x=i*W*.3-40;var ph=150+(i%2)*70;g.fillStyle="#a5b2c9";g.beginPath();g.moveTo(x,gy+10);g.lineTo(x+W*.22,gy-ph);g.lineTo(x+W*.44,gy+10);g.fill();g.fillStyle="#fff";g.beginPath();g.moveTo(x+W*.22,gy-ph);g.lineTo(x+W*.22-34,gy-ph+46);g.lineTo(x+W*.22+34,gy-ph+46);g.fill()}}}
 function draw(){
 var f=clamp(S.h/3000,0,1),bs=H*.62,sk=!(CFG.rm||S.shake<=0),sx=sk?(vr()-.5)*S.shake*18:0,sy0=sk?(vr()-.5)*S.shake*18:0,cmv=S.h/8,WC=CFG.cb?"#0072b2":"#ff4d4d";
 function sy(hp){return bs+(S.h-hp)+sy0}
@@ -238,17 +271,18 @@ if(CFG.seas){var ix=cmv<60?0:cmv<140?1:cmv<240?2:3,ed=[0,60,140,240],pv=Math.max
 else{gr.addColorStop(0,mix([126,205,255],[34,38,96],f));gr.addColorStop(1,mix([255,236,210],[120,90,170],f))}
 g.fillStyle=gr;g.fillRect(0,0,W,H);
 if(CFG.seas){g.fillStyle="rgba(15,15,60,"+f*.5+")";g.fillRect(0,0,W,H)}
-if(f>.35){g.fillStyle="rgba(255,255,255,"+(f-.35)*1.2+")";for(var s=0;s<50;s++)g.fillRect((s*137)%W,(s*89+S.t*2)%(H*.7),1.6,1.6)}
-g.fillStyle="rgba(255,226,140,.9)";g.beginPath();g.arc(W*.8,H*.17+f*50,34,0,6.283);g.fill();
-g.fillStyle="rgba(255,226,140,.2)";g.beginPath();g.arc(W*.8,H*.17+f*50,66,0,6.283);g.fill();
+if(MP.tint){g.fillStyle=MP.tint;g.fillRect(0,0,W,H)}
+var sf=MP.key==="night"?Math.max(f,.85):f;if(sf>.35){g.fillStyle="rgba(255,255,255,"+(sf-.35)*1.2+")";for(var s=0;s<50;s++)g.fillRect((s*137)%W,(s*89+S.t*2)%(H*.7),1.6,1.6)}
+g.fillStyle=MP.key==="night"?"rgba(235,238,255,.95)":"rgba(255,226,140,.9)";g.beginPath();g.arc(W*.8,H*.17+f*50,34,0,6.283);g.fill();
+g.fillStyle=MP.key==="night"?"rgba(200,210,255,.2)":"rgba(255,226,140,.2)";g.beginPath();g.arc(W*.8,H*.17+f*50,66,0,6.283);g.fill();
 for(var c=0;c<7;c++)cloud(((c*263+S.t*(6+c*2))%(W+300))-150,((c*211+S.h*.3)%(H+200))-100,.9+(c%3)*.3,.8);
 var gy=sy(0);
 if(gy<H+260){
-var fy=bs-30+S.h*.55+sy0;g.fillStyle=mix([150,214,170],[70,70,120],f);g.beginPath();g.moveTo(0,H+300);for(var x=0;x<=W;x+=20)g.lineTo(x,fy-Math.sin(x*.008)*40-Math.sin(x*.02)*14);g.lineTo(W,H+300);g.fill();
-g.fillStyle=mix([102,196,128],[50,60,100],f);g.beginPath();g.moveTo(0,H+300);for(x=0;x<=W;x+=20)g.lineTo(x,gy-Math.sin(x*.012+1)*26);g.lineTo(W,H+300);g.fill();
+var fy=bs-30+S.h*.55+sy0;g.fillStyle=mix(MP.hill[0],[70,70,120],f);g.beginPath();g.moveTo(0,H+300);for(var x=0;x<=W;x+=20)g.lineTo(x,fy-Math.sin(x*.008)*40-Math.sin(x*.02)*14);g.lineTo(W,H+300);g.fill();
+deco(gy);g.fillStyle=mix(MP.hill[1],[50,60,100],f);g.beginPath();g.moveTo(0,H+300);for(x=0;x<=W;x+=20)g.lineTo(x,gy-Math.sin(x*.012+1)*26);g.lineTo(W,H+300);g.fill();
 g.fillStyle="#fff8ec";for(x=10;x<W;x+=62){g.fillRect(x,gy-34,9,42)}g.fillRect(0,gy-22,W,6);
-var sg=g.createLinearGradient(0,gy,0,gy+260);sg.addColorStop(0,"#7a5238");sg.addColorStop(1,"#4a3022");g.fillStyle=sg;g.fillRect(0,gy+4,W,H);
-g.fillStyle="#5cbf6a";g.fillRect(0,gy,W,8);
+var sg=g.createLinearGradient(0,gy,0,gy+260);sg.addColorStop(0,MP.soil[0]);sg.addColorStop(1,MP.soil[1]);g.fillStyle=sg;g.fillRect(0,gy+4,W,H);
+g.fillStyle=MP.grass;g.fillRect(0,gy,W,8);
 }
 g.strokeStyle="#3f9e5a";g.lineCap="round";g.lineJoin="round";g.lineWidth=9;g.beginPath();
 var first=true;
@@ -298,25 +332,25 @@ eWW.style.display=CFG.thirst?"":"none";eW.style.width=S.thirst*100+"%";eW.classL
 var ct=CFG.combo&&S.combo>=2?"🔥 x"+(1+Math.min(S.combo,8)*.05).toFixed(2)+" · "+S.combo:"";eC.textContent=ct;eC.style.display=ct?"block":"none";
 eS.style.display=CFG.shield?"flex":"none";eS.style.setProperty("--p",clamp(1-S.shCd/S.shMax,0,1));
 for(var z=0;z<7;z++){eP[z].style.display=z<S.max?"":"none";eP[z].classList.toggle("lost",z>=S.lives)}
-eT.textContent=(label?label+" · ":"")+(o.daily?"DAILY":mode.toUpperCase())+" · Best "+Math.max(best,Math.floor(S.top/8))+" cm"}
+eT.textContent=LV?"LEVEL "+o.lvl+" · Goal "+LV.tgt+" cm":(label?label+" · ":"")+(o.daily?"DAILY":mode.toUpperCase())+" · Best "+Math.max(best,Math.floor(S.top/8))+" cm"}
 var last=performance.now();
 function frame(n){var dt=Math.min((n-last)/1000,.05);last=n;if(W>0){if(!paused)update(dt);draw()}requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
-return{size:size,setCtl:function(c){ctl=c},setOpp:function(x){opp=x},dead:function(){return S.dead},on:function(){return S.on},top:function(){return S.top},nb:function(){return nb},seeds:function(){return S.seeds},
+return{size:size,setCtl:function(c){ctl=c},setOpp:function(x){opp=x},dead:function(){return S.dead},on:function(){return S.on},top:function(){return S.top},nb:function(){return nb},seeds:function(){return S.seeds},done:function(){return S.dead||!!S.won},won:function(){return !!S.won},stars:function(){return S.stars||0},rk:function(){return rk},
 pause:function(b){paused=b},
 abort:function(){S.on=false;S.dead=false;paused=false;eO.style.display="none";eN.classList.remove("on")},
 recv:function(){if(!S.on||!CFG.sab)return;S.ev.push({k:"bird",tx:S.x+(vr()-.5)*60,t:0,dur:1.2*M[mode].w,dir:vr()<.5?-1:1,r:42});ftxt("Incoming!")},
-start:function(seed,m,lb,opt){o=opt||{};mode=m;label=lb;var F=FL[o.fl]||FL.poppy,U=o.up||{petal:0,reach:0,shield:0,roots:0};P={F:F,lv:F.lv+U.petal,gr:F.gr*(1+.05*U.roots),sh:(F.sh||1)*Math.pow(.88,U.shield),reach:U.reach};size();rnd=seeded(seed);reset();var bs=o.daily?SV.daily:SV.best;best=bs[o.daily?dkey():mode]||0;nb=false;paused=false;S.on=true;eO.style.display="none";eN.classList.remove("on");lastcm="";hint("steer","Steer with ← → or drag. Catch 💧 to grow faster.")}}
+start:function(seed,m,lb,opt){o=opt||{};mode=m;label=lb;var F=FL[o.fl]||FL.poppy,U=o.up||{petal:0,reach:0,shield:0,roots:0};P={F:F,lv:F.lv+U.petal,gr:F.gr*(1+.05*U.roots),sh:(F.sh||1)*Math.pow(.88,U.shield),reach:U.reach,bm:F.bm||1,th:F.th||1,nf:F.nf||0,wx:F.wx||1,sb:F.sb||1};LV=o.lvl?LEVELS[o.lvl-1]:null;MP=MAPS[LV?LV.map:o.map]||MAPS.meadow;mp=MP.mod||{};MM={sp:M[mode].sp,hz:M[mode].hz,cut:M[mode].cut,w:M[mode].w*P.wx};rk=0;size();rnd=seeded(seed);reset();var bs=o.daily?SV.daily:SV.best;best=bs[o.daily?dkey():mode]||0;nb=false;paused=false;S.on=true;eO.style.display="none";eN.classList.remove("on");lastcm="";hint("steer","Steer with ← → or drag. Catch 💧 to grow faster.");if(LV)ban("Level "+o.lvl+": "+LV.n);else if(MP.key!=="meadow")ban(MP.n)}}
 }
 
 var g1=Game($("pane1"),onEnd),g2=Game($("pane2"),onEnd),cur=[g1],UI={page:"main",back:"main",daily:false};
-function onEnd(){if(cur.every(function(x){return x.dead()})){AU.on=false;UI.page=cur.length>1?"over2":"over";render()}}
+function onEnd(){if(cur.every(function(x){return x.done()})){AU.on=false;UI.page=cur.length>1?"over2":"over";render()}}
 function B(id,fn){var e=$(id);if(e)e.onclick=fn}
 function blur(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
 function go(p,back){UI.page=p;if(back)UI.back=back;render()}
 function mh(){var a='<div class="modes">'+[["easy","Easy","Chill growth"],["medium","Medium","Brisk"],["hard","Hard","Chaos"]].map(function(m){return '<button class="mb'+(CFG.mode===m[0]?" on":"")+'" data-m="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>';
-return a+'<div class="modes">'+[["1","1 Player","Solo climb"],["2","2 Players","Split-screen"]].map(function(m){return '<button class="mb'+((CFG.two?"2":"1")===m[0]?" on":"")+'" data-p="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>'}
-function bindModes(){[].forEach.call(document.querySelectorAll(".mb[data-m],.mb[data-p]"),function(b){b.onclick=function(){if(b.dataset.m)CFG.mode=b.dataset.m;else CFG.two=b.dataset.p==="2"?1:0;saveCfg();render()}})}
+return a+'<div class="modes">'+[["1","1 Player","Solo climb"],["2","2 Players","Split-screen"]].map(function(m){return '<button class="mb'+((CFG.two?"2":"1")===m[0]?" on":"")+'" data-p="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>'+(CFG.two?'':'<div class="modes">'+[["inf","Infinite","Climb forever"],["lvl","Levels","Reach each goal"]].map(function(m){return '<button class="mb'+((CFG.kind||"inf")===m[0]?" on":"")+'" data-k="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>')}
+function bindModes(){[].forEach.call(document.querySelectorAll(".mb[data-m],.mb[data-p],.mb[data-k]"),function(b){b.onclick=function(){if(b.dataset.m)CFG.mode=b.dataset.m;else if(b.dataset.k)CFG.kind=b.dataset.k;else CFG.two=b.dataset.p==="2"?1:0;saveCfg();render()}})}
 function tg(k,b,s){return '<label class="tg"><span><b>'+b+'</b><small>'+s+'</small></span><input type="checkbox" data-k="'+k+'"'+(CFG[k]?" checked":"")+'></label>'}
 var HC=["Off","Player 1 gets +1 petal","Player 2 gets +1 petal"];
 function sets(){return '<div class="sec">Audio</div>'+tg("snd","Sound effects","Pickups, hits, shield, thunder")+tg("mus","Music","Soft ambient notes")+
@@ -329,46 +363,62 @@ B("rt",function(){SEEN={};store("bloom-seen",SEEN);$("rt").textContent="Tutorial
 function render(){var c=$("card"),p=UI.page;$("ov").classList.remove("hide");
 if(p==="main")main(c);else if(p==="green")green(c);else if(p==="settings"){c.innerHTML='<div class="logo">⚙️</div><h1 style="font-size:2.1rem">Settings</h1>'+sets()+'<button class="ghost" id="bk" style="width:100%;margin-top:12px">Back</button>';bindSets();B("bk",function(){go(UI.back||"main")})}
 else if(p==="pause"){c.innerHTML='<div class="logo">⏸️</div><h1 style="font-size:2.1rem">Paused</h1><div class="stack"><button id="go">Resume</button><button class="ghost" id="ex">Exit to menu</button></div><div class="note2">Esc also resumes. Changes apply right away.</div>'+sets();bindSets();B("go",resume);B("ex",exitGame)}
-else if(p==="over")over1(c);else over2(c)}
+else if(p==="levels")levelsPage(c);else if(p==="board")boardPage(c);else if(p==="over")over1(c);else over2(c)}
 function main(c){
 c.innerHTML='<div class="logo">🌱</div><h1>Bloom</h1><p class="tag" style="margin-bottom:8px">Grow the tallest flower in the garden.</p><div class="seed">🌰 '+SV.seeds+' seeds · '+FL[SV.sel].n+'</div>'+
 '<details class="how"><summary>How to play</summary><div class="r"><span class="i">💧</span><div><b>Catch water and sun</b>Faster growth. Rare power-ups: 🧪 ☂️ 🐞 🧲</div></div><div class="r"><span class="i">🍃</span><div><b>Leaf shield</b>Space, ↑ or the leaf button blocks a hit</div></div><div class="r"><span class="i">⛈️</span><div><b>Storms and hail</b>Lightning marks its spot first</div></div><div class="r"><span class="i">✂️</span><div><b>Gardeners and birds</b>Leave the warning ring in time</div></div><div class="r"><span class="i">🌿</span><div><b>Vines, frost and thirst</b>Use the gaps, avoid frost, stay watered</div></div></details>'+
-mh()+'<button id="go" style="width:100%">Plant the seed</button><div class="row3"><button class="ghost" id="dl">📅 Daily</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="st">⚙️ Settings</button></div>'+
+mh()+'<button id="go" style="width:100%">'+(CFG.kind==="lvl"&&!CFG.two?"Choose a level":"Plant the seed")+'</button><div class="row3"><button class="ghost" id="dl">📅 Daily</button><button class="ghost" id="lb">🏅 Leaderboard</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="st">⚙️ Settings</button></div>'+
 '<div class="hint">'+(CFG.two?"Player 1: A / D, W to shield · Player 2: ← / →, ↑ to shield":"Arrow keys, A / D or drag to steer")+' · Esc to pause</div>';
-B("go",function(){start(false)});B("dl",function(){start(true)});B("gh",function(){go("green")});B("st",function(){go("settings","main")});bindModes()}
-function green(c){var h='<div class="logo">🏡</div><h1 style="font-size:2rem">Greenhouse</h1><div class="seed">🌰 '+SV.seeds+' seeds</div><div class="sec">Flowers</div>';
+B("go",function(){if(CFG.kind==="lvl"&&!CFG.two)go("levels");else start(false)});B("dl",function(){start(true)});B("lb",function(){go("board")});B("gh",function(){go("green")});B("st",function(){go("settings","main")});bindModes()}
+function green(c){var h='<div class="logo">🏡</div><h1 style="font-size:2rem">Greenhouse</h1><div class="seed">🌰 '+SV.seeds+' seeds</div><div class="sec">Characters</div>';
 Object.keys(FL).forEach(function(k){var f=FL[k],own=SV.own[k],sel=SV.sel===k;h+='<div class="fc'+(sel?" on":"")+'"><span class="sw" style="background:linear-gradient(135deg,'+f.c[0]+','+f.c[1]+')"></span><span class="fi"><b>'+f.n+'</b><small>'+f.d+'</small></span><button class="sm" data-f="'+k+'"'+(!own&&SV.seeds<f.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+f.cost)+'</button></div>'});
+h+='<div class="sec">Maps <small>for Infinite mode</small></div>';
+Object.keys(MAPS).forEach(function(k){var m2=MAPS[k],own=SV.mapOwn[k],sel=SV.map===k;h+='<div class="fc'+(sel?" on":"")+'"><span class="sw" style="background:linear-gradient(135deg,rgb('+m2.hill[0]+'),rgb('+m2.hill[1]+'))"></span><span class="fi"><b>'+m2.n+'</b><small>'+m2.d+'</small></span><button class="sm" data-m2="'+k+'"'+(!own&&SV.seeds<m2.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+m2.cost)+'</button></div>'});
 h+='<div class="sec">Upgrades <small>solo and daily only</small></div>';
 Object.keys(UP).forEach(function(k){var u=UP[k],l=SV.up[k],mx=l>=u.max,cost=u.cost(l),pp="";for(var i=0;i<u.max;i++)pp+=i<l?"●":"○";h+='<div class="fc"><span class="fi"><b>'+u.n+' <span class="pips">'+pp+'</span></b><small>'+u.d+'</small></span><button class="sm" data-u="'+k+'"'+(mx||SV.seeds<cost?" disabled":"")+'>'+(mx?"Max":"🌰 "+cost)+'</button></div>'});
 h+='<div class="note2">Earn seeds by growing tall, catching pickups and near misses.</div><button class="ghost" id="bk" style="width:100%">Back</button>';
 c.innerHTML=h;
 [].forEach.call(c.querySelectorAll("[data-f]"),function(b){b.onclick=function(){var k=b.dataset.f,f=FL[k];if(!SV.own[k]&&SV.seeds>=f.cost){SV.seeds-=f.cost;SV.own[k]=1}if(SV.own[k])SV.sel=k;saveSv();green(c)}});
 [].forEach.call(c.querySelectorAll("[data-u]"),function(b){b.onclick=function(){var k=b.dataset.u,u=UP[k],l=SV.up[k],cost=u.cost(l);if(l<u.max&&SV.seeds>=cost){SV.seeds-=cost;SV.up[k]=l+1;saveSv()}green(c)}});
+[].forEach.call(c.querySelectorAll("[data-m2]"),function(b){b.onclick=function(){var k=b.dataset.m2,m2=MAPS[k];if(!SV.mapOwn[k]&&SV.seeds>=m2.cost){SV.seeds-=m2.cost;SV.mapOwn[k]=1}if(SV.mapOwn[k])SV.map=k;saveSv();green(c)}});
 B("bk",function(){go("main")})}
-function over1(c){var a=Math.floor(g1.top()/8),sd=g1.seeds();
-c.innerHTML='<div class="logo">'+(g1.nb()?"🏆":"🥀")+'</div><div class="tag" style="margin:0">'+(UI.daily?"Daily garden · ":"")+'You reached</div><div class="big">'+a+' cm</div><div class="tag">'+rank(a)+(g1.nb()?" · New best!":"")+'</div>'+(sd?'<div class="seed">+'+sd+' 🌰 seeds · '+SV.seeds+' total</div>':'')+'<div class="stack"><button id="go">'+(UI.daily?"Retry daily":"Grow again")+'</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="mn">Main menu</button></div>';
+function levelsPage(c){var h='<div class="logo">🗺️</div><h1 style="font-size:2rem">Levels</h1><p class="tag">Difficulty: '+CFG.mode+' · reach each goal height</p>';
+LEVELS.forEach(function(L,i){var n=i+1,un=n===1||SV.lv[n-1]>0,st=SV.lv[n]||0;h+='<div class="fc"><span class="fi"><b>'+n+'. '+L.n+'</b><small>'+MAPS[L.map].n+' · goal '+L.tgt+' cm · '+(st?"★".repeat(st)+"☆".repeat(3-st):un?"not cleared":"locked")+'</small></span><button class="sm" data-l="'+n+'"'+(un?"":" disabled")+'>'+(un?"Play":"🔒")+'</button></div>'});
+h+='<button class="ghost" id="bk" style="width:100%;margin-top:8px">Back</button>';c.innerHTML=h;[].forEach.call(c.querySelectorAll("[data-l]"),function(b){b.onclick=function(){start(false,+b.dataset.l)}});B("bk",function(){go("main")})}
+var BT="inf-medium";
+function boardPage(c){var tabs=[["inf-easy","Easy"],["inf-medium","Medium"],["inf-hard","Hard"],["daily-"+dkey(),"Daily"]],l=SV.lb[BT]||[],h='<div class="logo">🏅</div><h1 style="font-size:2rem">Leaderboard</h1><div class="note2">Saved on this device. Infinite runs and the daily garden count.</div><div class="row2"><input class="inp" id="nm" maxlength="14" placeholder="Your name" value="'+cl(SV.name)+'"><button class="sm" id="sv">Save</button></div><div class="modes">'+tabs.map(function(t){return '<button class="mb'+(BT===t[0]?" on":"")+'" data-bt="'+t[0]+'">'+t[1]+'</button>'}).join("")+'</div>';
+h+=l.length?l.map(function(e,i){return '<div class="fc"><span class="fi"><b>#'+(i+1)+' '+cl(e.n)+'</b><small>'+new Date(e.d).toLocaleDateString()+'</small></span><b>'+(+e.c||0)+' cm</b></div>'}).join(""):'<div class="note2">No runs here yet. Go grow something tall!</div>';
+h+='<button class="ghost" id="bk" style="width:100%;margin-top:8px">Back</button>';c.innerHTML=h;
+B("sv",function(){SV.name=cl($("nm").value);saveSv();$("sv").textContent="Saved ✓"});
+[].forEach.call(c.querySelectorAll("[data-bt]"),function(b){b.onclick=function(){BT=b.dataset.bt;boardPage(c)}});B("bk",function(){go("main")})}
+function overL(c){var L=LEVELS[UI.lvl-1],w=g1.won(),st=g1.stars(),sd=g1.seeds(),a=Math.floor(g1.top()/8),nx=UI.lvl<LEVELS.length;
+c.innerHTML='<div class="logo">'+(w?"🌸":"🥀")+'</div><div class="tag" style="margin:0">Level '+UI.lvl+' · '+L.n+'</div><div class="big" style="font-size:2.4rem">'+(w?"Level complete!":"Wilted at "+a+" cm")+'</div>'+(w?'<div class="big" style="font-size:2rem">'+"★".repeat(st)+"☆".repeat(3-st)+'</div>':'<div class="tag">Goal: '+L.tgt+' cm</div>')+(sd?'<div class="seed">+'+sd+' 🌰 seeds</div>':'')+'<div class="stack"><button id="go">'+(w&&nx?"Next level":"Retry")+'</button>'+(w&&nx?'<button class="ghost" id="rt2">Retry</button>':'')+'<button class="ghost" id="lv">All levels</button><button class="ghost" id="mn">Main menu</button></div>';
+B("go",function(){start(false,w&&nx?UI.lvl+1:UI.lvl)});B("rt2",function(){start(false,UI.lvl)});B("lv",function(){go("levels")});B("mn",function(){go("main")})}
+function over1(c){if(UI.lvl){overL(c);return}var a=Math.floor(g1.top()/8),sd=g1.seeds(),rk=g1.rk();
+c.innerHTML='<div class="logo">'+(g1.nb()?"🏆":"🥀")+'</div><div class="tag" style="margin:0">'+(UI.daily?"Daily garden · ":"")+'You reached</div><div class="big">'+a+' cm</div><div class="tag">'+rank(a)+(g1.nb()?" · New best!":"")+'</div>'+(rk?'<div class="seed">🏅 #'+rk+' on the leaderboard</div> ':'')+(sd?'<div class="seed">+'+sd+' 🌰 seeds · '+SV.seeds+' total</div>':'')+'<div class="stack"><button id="go">'+(UI.daily?"Retry daily":"Grow again")+'</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="mn">Main menu</button></div>';
 B("go",function(){start(UI.daily)});B("gh",function(){go("green")});B("mn",function(){go("main")})}
 function over2(c){var a=Math.floor(g1.top()/8),b=Math.floor(g2.top()/8),w=a===b?0:a>b?1:2;
 c.innerHTML='<div class="logo">🏆</div><div class="big" style="font-size:2.4rem">'+(w?"Player "+w+" wins!":"It’s a tie!")+'</div><div class="vs"><div'+(w===1?' class="w"':'')+'>Player 1<b>'+a+' cm</b></div><div'+(w===2?' class="w"':'')+'>Player 2<b>'+b+' cm</b></div></div><div class="stack"><button id="go">Race again</button><button class="ghost" id="mn">Main menu</button></div>';
 B("go",function(){start(false)});B("mn",function(){go("main")})}
-function start(daily){
-au();blur();UI.daily=daily;
-var two=!!CFG.two&&!daily,seed=daily?dseed():Math.floor(Math.random()*1e9);
+function start(daily,lvl){
+au();blur();UI.daily=daily;UI.lvl=lvl||0;
+var two=!!CFG.two&&!daily&&!lvl,seed=daily?dseed():Math.floor(Math.random()*1e9);
 document.body.classList.toggle("two",two);
 cur=two?[g1,g2]:[g1];
 cur.forEach(function(gm,i){
 gm.setCtl(two?(i?{l:["arrowleft"],r:["arrowright"],s:["arrowup"]}:{l:["a"],r:["d"],s:["w"]}):{l:["arrowleft","a"],r:["arrowright","d"],s:["arrowup"," ","w"]});
-gm.start(two&&!CFG.same?seed+i*7919:seed,daily?"medium":CFG.mode,two?"P"+(i+1):"",{fl:SV.sel,up:!two&&!daily?SV.up:null,daily:daily,two:two,hc:two&&CFG.hcap===i+1?1:0});
+gm.start(two&&!CFG.same?seed+i*7919:seed,daily?"medium":CFG.mode,two?"P"+(i+1):"",{fl:SV.sel,up:!two&&!daily?SV.up:null,daily:daily,two:two,lvl:lvl||0,map:daily?"meadow":SV.map,hc:two&&CFG.hcap===i+1?1:0});
 gm.setOpp(two?cur[1-i]:null)});
 $("ov").classList.add("hide");AU.on=true}
 function pause(){if(!cur.some(function(x){return x.on()}))return;cur.forEach(function(x){x.pause(true)});AU.on=false;UI.page="pause";render()}
 function resume(){blur();cur.forEach(function(x){x.pause(false)});$("ov").classList.add("hide");AU.on=true}
 function exitGame(){cur.forEach(function(x){x.abort()});AU.on=false;UI.page="main";render()}
 function esc(){var hidden=$("ov").classList.contains("hide");
-if(hidden)pause();else if(UI.page==="pause")resume();else if(UI.page==="green"||UI.page==="settings")go(UI.back||"main")}
+if(hidden)pause();else if(UI.page==="pause")resume();else if(["green","settings","levels","board"].indexOf(UI.page)>-1)go(UI.back||"main")}
 addEventListener("keydown",function(e){
-if([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.key)>-1)e.preventDefault();
 if(e.key==="Escape"){if(!e.repeat)esc();return}
+if(e.target&&e.target.tagName==="INPUT")return;
+if([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.key)>-1)e.preventDefault();
 keys[e.key.toLowerCase()]=true;
 if(e.key==="Enter"&&UI.page==="main"&&!$("ov").classList.contains("hide")&&document.activeElement===document.body)start(false)});
 addEventListener("keyup",function(e){keys[e.key.toLowerCase()]=false});
