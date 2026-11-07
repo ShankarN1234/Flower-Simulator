@@ -6,11 +6,13 @@
 <title>Bloom: Grow the Tallest Flower</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Nunito:wght@600;800&family=Fredoka:wght@500;600&display=swap">
 <style>
-:root{--card:rgba(255,252,246,.95);--ink:#2c2a3a;--muted:#6b6678;--accent:#e85d8a;--chip:rgba(255,255,255,.72);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--card:rgba(38,33,56,.95);--ink:#f5f0ff;--muted:#bdb4d4;--chip:rgba(30,26,48,.72);color-scheme:dark}}
-:root[data-theme="dark"]{--card:rgba(38,33,56,.95);--ink:#f5f0ff;--muted:#bdb4d4;--chip:rgba(30,26,48,.72);color-scheme:dark}
+:root{--card:rgba(255,252,246,.96);--ink:#2c2a3a;--muted:#6b6678;--accent:#e85d8a;--chip:rgba(255,255,255,.72);--line:rgba(120,110,150,.16);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--card:rgba(38,33,56,.96);--ink:#f5f0ff;--muted:#bdb4d4;--chip:rgba(30,26,48,.72);--line:rgba(200,190,230,.16);color-scheme:dark}}
+:root[data-theme="dark"]{--card:rgba(38,33,56,.96);--ink:#f5f0ff;--muted:#bdb4d4;--chip:rgba(30,26,48,.72);--line:rgba(200,190,230,.16);color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;height:100%;overflow:hidden;background:#9fd8ff;font-family:Nunito,system-ui,sans-serif;color:var(--ink);touch-action:none;user-select:none;-webkit-user-select:none}
+input{user-select:text;-webkit-user-select:text}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 #arena{position:fixed;inset:0;display:flex}
 .pane{position:relative;flex:1;min-width:0;overflow:hidden}
 #pane2{display:none;border-left:3px solid rgba(255,255,255,.75)}
@@ -36,42 +38,76 @@ body.two .hh{font-size:1.4rem}body.two .pill{padding:6px 10px}body.two .pet{font
 .shb{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);width:64px;height:64px;border-radius:50%;padding:0;font-size:1.6rem;background:conic-gradient(var(--accent) calc(var(--p,1)*360deg),rgba(120,120,140,.4) 0);box-shadow:0 6px 18px rgba(30,30,80,.25);display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:none}
 .shb:hover{transform:translateX(-50%)}
 .shb span{width:52px;height:52px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center}
-#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,18,50,.3);backdrop-filter:blur(3px)}
+.pb{position:absolute;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);width:46px;height:46px;border-radius:50%;padding:0;font-size:1.05rem;background:var(--chip);color:var(--ink);box-shadow:0 4px 14px rgba(30,30,80,.2);pointer-events:auto;backdrop-filter:blur(6px);touch-action:none}
+.pb:hover{transform:scale(1.06)}
+#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,18,50,.32);backdrop-filter:blur(4px)}
 #ov.hide{display:none}
-.card{width:100%;max-width:440px;max-height:94vh;overflow:auto;background:var(--card);border-radius:28px;padding:26px 24px;text-align:center;box-shadow:0 24px 70px rgba(20,15,60,.35);touch-action:pan-y}
-.logo{font-size:2.4rem}
-h1{font:900 2.6rem/1.05 Fraunces,Georgia,serif;margin:4px 0 6px;background:linear-gradient(90deg,#e85d8a,#f5a524);-webkit-background-clip:text;background-clip:text;color:transparent}
-.tag{margin:0 0 14px;color:var(--muted);font-weight:600}
-.seed{display:inline-block;background:var(--chip);border-radius:99px;padding:5px 14px;font-weight:800;font-size:.85rem;margin-bottom:14px}
-button{font:600 1.05rem Fredoka,Nunito,sans-serif;letter-spacing:.01em;border:0;border-radius:999px;padding:13px 30px;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff6b9a,#f5a524);box-shadow:0 8px 22px rgba(232,93,138,.45);transition:transform .15s}
-button:hover{transform:translateY(-2px) scale(1.03)}
+.card{width:100%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;background:var(--card);border-radius:30px;box-shadow:0 24px 70px rgba(20,15,60,.38);animation:pop .28s ease}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes bob{50%{transform:translateY(-6px) rotate(4deg)}}
+.float{display:inline-block;animation:bob 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.card,.float{animation:none}}
+.cb{flex:1;min-height:0;overflow:auto;padding:22px 22px 14px;text-align:center;touch-action:pan-y}
+.cf{padding:12px 22px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.ch{display:flex;align-items:center;gap:10px;padding:14px 18px 12px;border-bottom:1px solid var(--line)}
+.ch h2{flex:1;margin:0;font:900 1.35rem Fraunces,Georgia,serif;text-align:left}
+.back{padding:0;width:40px;height:40px;font-size:1.1rem;flex:none}
+@media (max-width:560px){#ov{align-items:flex-end;padding:0}.card{max-width:none;max-height:94vh;border-radius:28px 28px 0 0}}
+.logo{font-size:2.6rem}
+h1{font:900 2.6rem/1.05 Fraunces,Georgia,serif;margin:2px 0 4px;background:linear-gradient(90deg,#e85d8a,#f5a524);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{margin:0 0 12px;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.chip{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-weight:800;font-size:.78rem;white-space:nowrap}
+button{font:600 1.05rem Fredoka,Nunito,sans-serif;letter-spacing:.01em;border:0;border-radius:999px;padding:13px 30px;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff6b9a,#f5a524);box-shadow:0 8px 22px rgba(232,93,138,.4);transition:transform .15s}
+button:hover{transform:translateY(-2px) scale(1.02)}
 button:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.ghost{background:var(--chip);color:var(--ink);box-shadow:none;border:2px solid transparent}
-.stack{display:grid;gap:8px;margin:12px 0 4px}.stack button{width:100%}
-.row3{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 0}.row3 button{padding:11px 4px;font-size:.88rem}
-.hint{margin-top:12px;font-size:.78rem;color:var(--muted);font-weight:600}
-.modes{display:flex;gap:8px;margin:0 0 10px}
-.mb{flex:1;font:600 .92rem Fredoka,Nunito,sans-serif;padding:9px 6px;border-radius:14px;color:var(--ink);background:var(--chip);box-shadow:none;border:2px solid transparent}
-.mb:hover{transform:none}.mb.on{border-color:var(--accent);background:var(--card)}.mb small{display:block;font-weight:600;color:var(--muted);font-size:.68rem}
+.ghost{background:var(--chip);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.play{width:100%;font-size:1.2rem;padding:15px}
+.wide{width:100%;margin-top:6px}
+.sm{padding:8px 14px;font-size:.82rem;flex:none}
+.stack{display:grid;gap:8px;margin:8px 0}.stack button{width:100%}
+.hint{margin-top:10px;font-size:.74rem;color:var(--muted);font-weight:600;text-align:center}
+.lab{text-align:left;font:800 .68rem Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 4px 5px}
+.seg{display:flex;background:var(--chip);border:1px solid var(--line);border-radius:16px;padding:4px;gap:4px;margin-bottom:12px}
+.seg button{flex:1;padding:8px 4px;border-radius:12px;background:transparent;color:var(--ink);box-shadow:none;font-size:.88rem}
+.seg button:hover{transform:none}
+.seg button.on{background:var(--card);color:var(--accent);box-shadow:0 2px 8px rgba(30,30,80,.15)}
+.seg small{display:block;font:600 .64rem Nunito,sans-serif;color:var(--muted)}
+.navr{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.navr button{padding:8px 2px;border-radius:16px;font-size:.74rem;display:flex;flex-direction:column;gap:1px;align-items:center;background:var(--chip);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.navr b{font-size:1.2rem;font-weight:400}
+.navr2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.navr2 button{padding:11px 4px;font-size:.9rem}
 .big{font:900 3.2rem/1 Fraunces,Georgia,serif;margin:6px 0}
-.vs{display:flex;gap:10px;margin:10px 0 14px}.vs div{flex:1;background:var(--chip);border-radius:16px;padding:10px;font-weight:800}.vs div.w{outline:3px solid #f5a524}.vs b{display:block;font:900 1.8rem Fraunces,Georgia,serif}
-details.how{text-align:left;margin-bottom:12px;background:var(--chip);border-radius:14px;padding:8px 14px;font-weight:700;font-size:.88rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}
+.st{background:var(--chip);border:1px solid var(--line);border-radius:16px;padding:10px 4px}.st b{display:block;font:900 1.3rem Fraunces,Georgia,serif}.st small{color:var(--muted);font-weight:700;font-size:.68rem}
+.vs{display:flex;gap:10px;margin:10px 0 6px}.vs div{flex:1;background:var(--chip);border-radius:16px;padding:10px;font-weight:800}.vs div.w{outline:3px solid #f5a524}.vs b{display:block;font:900 1.8rem Fraunces,Georgia,serif}
+details.how{text-align:left;margin-top:4px;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:8px 14px;font-weight:700;font-size:.88rem}
 details.how summary{cursor:pointer;font-weight:800}
 .r{display:flex;gap:10px;align-items:center;padding:6px 0;font-size:.82rem;font-weight:600}.r b{display:block;font-weight:800}.r .i{font-size:1.4rem}
-.sec{text-align:left;font:800 .72rem Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:14px 2px 6px}.sec small{text-transform:none;letter-spacing:0;color:var(--muted);font-weight:600}
-.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--chip);border-radius:14px;padding:8px 14px;margin-bottom:6px;text-align:left;cursor:pointer}
-.tg b{display:block;font-size:.88rem}.tg small{color:var(--muted);font-weight:600;font-size:.72rem}
+.sec{text-align:left;font:800 .72rem Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:14px 2px 6px}
+.tgs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:560px){.tgs{grid-template-columns:1fr}}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:8px 14px;text-align:left;cursor:pointer}
+.tg b{display:block;font-size:.86rem}.tg small{color:var(--muted);font-weight:600;font-size:.7rem}
 .tg input{appearance:none;-webkit-appearance:none;flex:none;width:44px;height:26px;border-radius:99px;background:#b9b4c8;position:relative;cursor:pointer;transition:.2s;margin:0}
 .tg input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
 .tg input:checked{background:var(--accent)}.tg input:checked::after{left:21px}
-.fc{display:flex;align-items:center;gap:10px;background:var(--chip);border-radius:14px;padding:8px 12px;margin-bottom:6px;text-align:left;border:2px solid transparent}
-.fc.on{border-color:var(--accent)}.fc .fi{flex:1}.fc b{display:block;font-size:.9rem}.fc small{color:var(--muted);font-weight:600;font-size:.72rem}
-.sw{width:30px;height:30px;border-radius:50%;flex:none}.pips{color:var(--accent);letter-spacing:2px;font-size:.8rem}
-.sm{padding:8px 14px;font-size:.82rem;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:380px){.grid2{grid-template-columns:1fr}}
+.gc{background:var(--chip);border:2px solid var(--line);border-radius:20px;padding:12px 10px;display:flex;flex-direction:column;gap:5px;align-items:center;text-align:center}
+.gc.on{border-color:var(--accent)}.gc b{font-size:.92rem}.gc small{color:var(--muted);font-weight:600;font-size:.7rem;min-height:2.2em}
+.mi{width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.9rem}
+.fc{display:flex;align-items:center;gap:10px;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:8px 12px;margin-bottom:6px;text-align:left}
+.fc .fi{flex:1}.fc b{display:block;font-size:.9rem}.fc small{color:var(--muted);font-weight:600;font-size:.72rem}
+.fc.top{background:linear-gradient(90deg,rgba(245,165,36,.22),var(--chip))}.md{width:34px;text-align:center;font-size:1.3rem}
+.pips{color:var(--accent);letter-spacing:2px;font-size:.8rem}
+.lg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lt{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:18px;background:var(--chip);color:var(--ink);box-shadow:none;border:1px solid var(--line);font-size:.86rem}
+.lt .ln{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff6b9a,#f5a524);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.lt.lock .ln{background:var(--line);color:var(--muted)}.lt small{color:var(--muted);font-weight:600;font-size:.7rem}.lt .ls{color:#f5a524;letter-spacing:2px}
 .note2{color:var(--muted);font-size:.76rem;font-weight:600;margin:8px 0}
 .row2{display:flex;gap:8px;margin-bottom:10px}
-.inp{flex:1;min-width:0;font:600 1rem Fredoka,Nunito,sans-serif;padding:10px 14px;border-radius:14px;border:2px solid var(--chip);background:var(--chip);color:var(--ink);text-align:center}
-input{user-select:text;-webkit-user-select:text}
+.inp{flex:1;min-width:0;font:600 1rem Fredoka,Nunito,sans-serif;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--chip);color:var(--ink);text-align:center}
 </style>
 </head>
 <body>
@@ -83,7 +119,7 @@ var keys={},$=function(i){return document.getElementById(i)};
 function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v&&typeof v==="object"?Object.assign({},d,v):d}catch(e){return d}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var M={easy:{sp:1.1,hz:1.5,cut:.1,w:1.15},medium:{sp:1.5,hz:1,cut:.15,w:.9},hard:{sp:1.95,hz:.65,cut:.22,w:.7}};
-var CFG=load("bloom-cfg",{mode:"medium",two:0,snd:1,mus:1,rm:0,cb:0,shield:1,pu:1,thirst:1,seas:1,giant:1,combo:1,slow:1,tut:1,same:1,sab:1,hcap:0,kind:"inf"});
+var CFG=load("bloom-cfg",{mode:"medium",two:0,snd:1,mus:1,rm:0,cb:0,shield:1,pu:1,thirst:1,seas:1,giant:1,combo:1,slow:1,tut:1,same:1,sab:1,hcap:0,kind:"inf",ml:1});
 if(!M[CFG.mode])CFG.mode="medium";
 var SV=load("bloom-save",{seeds:0,own:{poppy:1},sel:"poppy",up:{},best:{},daily:{},mapOwn:{meadow:1},map:"meadow",lv:{},lb:{},name:"Player"});
 SV.own=Object.assign({poppy:1},SV.own);SV.up=Object.assign({petal:0,reach:0,shield:0,roots:0},SV.up);SV.best=SV.best||{};SV.daily=SV.daily||{};SV.mapOwn=Object.assign({meadow:1},SV.mapOwn);SV.lv=SV.lv||{};SV.lb=SV.lb||{};SV.name=SV.name||"Player";SV.map=SV.mapOwn[SV.map]?SV.map:"meadow";
@@ -110,7 +146,9 @@ meadow:{n:"Meadow",cost:0,d:"The classic garden",tint:null,hill:[[150,214,170],[
 desert:{n:"Dusty Oasis",cost:120,d:"Thirstier, but more sunlight",tint:"rgba(255,170,70,.18)",hill:[[232,192,122],[217,164,90]],grass:"#c9a24d",soil:["#c98b52","#8f5a33"],mod:{th:1.5,sun:.35}},
 forest:{n:"Rainforest",cost:200,d:"Frequent storms and tangled vines",tint:"rgba(40,140,90,.2)",hill:[[79,155,107],[47,125,79]],grass:"#2f9e55",soil:["#5a3d2b","#33231a"],mod:{st:.6,vn:.6}},
 mountain:{n:"Frosty Peaks",cost:300,d:"Gusty winds and lots of frost",tint:"rgba(140,170,230,.2)",hill:[[185,196,214],[141,155,181]],grass:"#dfe8f2",soil:["#6e6a78","#3e3b47"],mod:{wd:2,fz:.5}},
-night:{n:"Moonlit Garden",cost:420,d:"Starry night and faster growth",tint:"rgba(20,15,70,.45)",hill:[[58,74,122],[42,53,96]],grass:"#3f8f78",soil:["#3a2a40","#1e1426"],mod:{gr:1.1}}};
+night:{n:"Moonlit Garden",cost:420,d:"Starry night and faster growth",tint:"rgba(20,15,70,.45)",hill:[[58,74,122],[42,53,96]],grass:"#3f8f78",soil:["#3a2a40","#1e1426"],mod:{gr:1.1}},
+mars:{n:"Mars Colony",cost:480,d:"Dust gusts, thirsty soil, extra sunlight",tint:"rgba(220,105,60,.32)",hill:[[196,98,66],[160,70,46]],grass:"#b5532f",soil:["#8a3b25","#4d1f14"],ns:1,nf:1,mod:{gust:1.2,th:1.3,sun:.25}},
+space:{n:"Outer Space",cost:700,d:"Pass the Moon, Mars, Jupiter and Saturn",tint:null,hill:[[120,118,138],[90,88,108]],grass:"#b9b7c8",soil:["#6f6c80","#2e2c3a"],space:1,ns:1,nf:1,mod:{wd:.35,th:.8,fz:.7}}};
 Object.keys(MAPS).forEach(function(k){MAPS[k].key=k});
 var LEVELS=[
 {n:"Sprout Meadow",tgt:60,map:"meadow",haz:["snip"]},
@@ -120,14 +158,29 @@ var LEVELS=[
 {n:"Dusty Oasis",tgt:230,map:"desert",haz:["snip","bird","storm","frost"]},
 {n:"Rainforest Rush",tgt:280,map:"forest",haz:["snip","bird","storm","vine"]},
 {n:"Frosty Peaks",tgt:340,map:"mountain",haz:["snip","bird","storm","vine","frost"]},
-{n:"Moonlit Finale",tgt:420,map:"night",haz:["snip","bird","storm","vine","frost","giant"]}];
+{n:"Moonlit Night",tgt:420,map:"night",haz:["snip","bird","storm","vine","frost","giant"]},
+{n:"Red Planet",tgt:500,map:"mars",haz:["snip","bird","storm","vine","frost","giant"]},
+{n:"Among the Stars",tgt:600,map:"space",haz:["snip","bird","storm","vine","frost","giant"]}];
 function cl(s){return String(s==null?"":s).replace(/[^A-Za-z0-9 _.-]/g,"").slice(0,14)||"Player"}
 function addScore(b,cm){if(cm<1)return 0;var l=(SV.lb[b]||[]).slice(),e={n:cl(SV.name),c:cm,d:Date.now()};l.push(e);l.sort(function(a,z){return z.c-a.c||a.d-z.d});SV.lb[b]=l.slice(0,10);return SV.lb[b].indexOf(e)+1}
-var SEAS=[{n:"Spring",i:"🌸",t:[126,205,255],b:[255,236,210]},{n:"Summer",i:"☀️",t:[60,165,255],b:[255,228,150]},{n:"Autumn",i:"🍂",t:[236,150,100],b:[255,214,170]},{n:"Winter",i:"❄️",t:[140,160,210],b:[228,238,252]}];
+var ZN=[{n:"Moon",i:"🌙"},{n:"Mars",i:"🔴"},{n:"Jupiter",i:"🟠"},{n:"Saturn",i:"🪐"},{n:"Deep space",i:"✨"}],ZG=[1.08,1,.92,1,1.15];
+var PL=[{t:"earth",x:.2,hp:120,r:72},{t:"moon",x:.78,hp:420,r:34},{t:"mars",x:.74,hp:950,r:62},{t:"jupiter",x:.24,hp:1750,r:115},{t:"saturn",x:.7,hp:2600,r:92},{t:"galaxy",x:.5,hp:4700,r:170},{t:"neptune",x:.28,hp:3400,r:68},{t:"moon",x:.8,hp:3900,r:26}];
+var STG=[
+{n:"Spring",i:"🌸",f:0,w:14,t:[126,205,255],b:[255,236,210]},
+{n:"Summer",i:"☀️",f:60,w:14,t:[60,165,255],b:[255,228,150]},
+{n:"Autumn",i:"🍂",f:140,w:14,t:[236,150,100],b:[255,214,170]},
+{n:"Winter",i:"❄️",f:240,w:14,t:[140,160,210],b:[228,238,252]},
+{n:"Cloud Kingdom",i:"☁️",f:340,w:24,t:[110,170,240],b:[245,248,255]},
+{n:"Stratosphere",i:"🌌",f:470,w:40,t:[28,50,120],b:[90,70,170]},
+{n:"Outer Space",i:"🚀",f:620,w:60,t:[5,6,26],b:[52,24,96]},
+{n:"Deep Space",i:"✨",f:800,w:60,t:[2,2,12],b:[18,12,50]}],SG=[1,1,1,.92,1,1.04,1.08,1.15];
+function stgI(cm){var r=0;for(var i=0;i<STG.length;i++)if(cm>=STG[i].f)r=i;return r}
 function lerp(a,b,t){return a+(b-a)*t}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function mix(a,b,t){return "rgb("+[0,1,2].map(function(i){return Math.round(lerp(a[i],b[i],t))}).join(",")+")"}
-function rank(cm){return cm<30?"Seedling":cm<80?"Tall as a tulip":cm<150?"Sunflower club":cm<300?"Beanstalk":"Garden legend"}
+var RANKS=[[0,"Seedling"],[12,"Sprout"],[30,"Tall as a tulip"],[50,"Garden gnome"],[80,"Sunflower club"],[110,"Picket fence"],[150,"Treetop"],[200,"Beanstalk"],[260,"Skyscraper"],[340,"Cloud hopper"],[430,"Jet stream"],[520,"Edge of the sky"],[620,"Astronaut"],[720,"Moon walker"],[850,"Planet hopper"],[1000,"Star climber"],[1200,"Galactic gardener"],[1500,"Cosmic legend"]];
+function rankIdx(cm){var r=0;for(var i=0;i<RANKS.length;i++)if(cm>=RANKS[i][0])r=i;return r}
+function rank(cm){return RANKS[rankIdx(cm)][1]}
 function seeded(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function dkey(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
 function dseed(){var d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()}
@@ -143,20 +196,21 @@ var NOTES=[261.6,293.7,329.6,392,440,523.3,587.3],mt=0;
 setInterval(function(){if(!CFG.mus||!AU.on||!AU.ctx)return;mt++;if(mt%4===0)tone(NOTES[(mt/4|0)%3]/2,2.2,"sine",.035);if(Math.random()<.6)tone(NOTES[Math.floor(Math.random()*NOTES.length)],1.2,"sine",.03)},600);
 
 var pets="";for(var pi=0;pi<7;pi++)pets+='<span class="pet">🌸</span>';
-var PANE='<canvas></canvas><div class="hud"><div><div class="pill"><div class="hh">0<small> cm</small></div><div class="rank">Seedling</div></div><div class="boostw"><div class="boost"></div></div><div class="boostw thw"><div class="thirst"></div></div></div><div class="pill"><div class="pets">'+pets+'</div><div class="best">Best 0 cm</div></div></div><div class="cmb"></div><div class="toast"></div><div class="out"></div><button class="shb"><span>🍃</span></button>';
+var PANE='<canvas></canvas><div class="hud"><div><div class="pill"><div class="hh">0<small> cm</small></div><div class="rank">Seedling</div></div><div class="boostw"><div class="boost"></div></div><div class="boostw thw"><div class="thirst"></div></div></div><div class="pill"><div class="pets">'+pets+'</div><div class="best">Best 0 cm</div></div></div><div class="cmb"></div><div class="toast"></div><div class="out"></div><button class="shb" aria-label="Leaf shield"><span>🍃</span></button><button class="pb" aria-label="Pause">⏸</button>';
 $("pane1").innerHTML=PANE;$("pane2").innerHTML=PANE;
 
-function Game(root,onEnd){
+function Game(root,onEnd,onPause){
 var cv=root.querySelector("canvas"),g=cv.getContext("2d"),W=0,H=0,D=1,vr=Math.random,rnd=seeded(1),mode="medium",label="",best=0,S,nb=false,lastcm="",paused=false,opp=null,o={},P={F:FL.poppy,gr:1,sh:1,reach:0,lv:3};
 var ctl={l:["arrowleft","a"],r:["arrowright","d"],s:["arrowup"," ","w"]};
 var MP=MAPS.meadow,mp={},LV=null,MM=M.medium,rk=0;
 var q=function(c){return root.querySelector(c)},eH=q(".hh"),eR=q(".rank"),eB=q(".boost"),eW=q(".thirst"),eWW=q(".thw"),eT=q(".best"),eO=q(".out"),eN=q(".toast"),eC=q(".cmb"),eS=q(".shb"),eP=root.querySelectorAll(".pet");
 function size(){D=Math.min(window.devicePixelRatio||1,2);W=root.clientWidth;H=root.clientHeight;cv.width=W*D;cv.height=H*D;g.setTransform(D,0,0,D,0,0)}
-function reset(){var mx=Math.min(7,P.lv+(o.hc?1:0));S={on:false,dead:false,t:0,h:0,top:0,x:W/2,tx:W/2,xs:[W/2],lives:mx,max:mx,inv:0,boost:0,storm:0,sm:0,stormT:16,wind:0,ltT:0,garT:6,pkT:1,ev:[],pk:[],pt:[],ft:[],flash:0,shake:0,frost:0,hl:[],hailT:0,birdT:9,vineT:12,fT:7,vn:[],fz:[],thirst:1,combo:0,comboT:0,shT:0,shCd:0,shMax:1,umb:0,lady:0,mag:0,gold:0,gdT:22,giT:20,slow:0,sn:0,ban:null,nt:0,pc:0,seeds:0}}
+function reset(){var mx=Math.min(7,P.lv+(o.hc?1:0));S={on:false,dead:false,t:0,h:0,top:0,x:W/2,tx:W/2,xs:[W/2],lives:mx,max:mx,inv:0,boost:0,storm:0,sm:0,stormT:16,wind:0,ltT:0,garT:6,pkT:1,ev:[],pk:[],pt:[],ft:[],zn:0,rkI:0,flash:0,shake:0,frost:0,hl:[],hailT:0,birdT:9,vineT:12,fT:7,vn:[],fz:[],thirst:1,combo:0,comboT:0,shT:0,shCd:0,shMax:1,umb:0,lady:0,mag:0,gold:0,gdT:22,giT:20,slow:0,sn:0,ban:null,nt:0,pc:0,seeds:0}}
 size();reset();
 function pm(e){if(S.on&&!paused){var r=root.getBoundingClientRect();S.tx=clamp(e.clientX-r.left,34,W-34)}}
 root.addEventListener("pointermove",pm);root.addEventListener("pointerdown",pm);
 eS.addEventListener("pointerdown",function(e){e.stopPropagation();e.preventDefault();doShield()});
+q(".pb").addEventListener("pointerdown",function(e){e.stopPropagation();e.preventDefault();if(onPause)onPause()});
 addEventListener("resize",size);
 function ftxt(s){S.ft.push({s:s,x:S.x,hp:S.h+46,l:1.5})}
 function hint(k,s){if(!CFG.tut||SEEN[k])return;SEEN[k]=1;store("bloom-seen",SEEN);eN.textContent=s;eN.classList.add("on");S.nt=3.6}
@@ -204,24 +258,26 @@ if(d)S.tx=clamp(S.tx+d*400*dt,34,W-34);
 if(ctl.s.some(function(k){return keys[k]}))doShield();
 if(CFG.shield&&S.t>15)hint("shield","🍃 Press Space or tap the leaf for a quick shield.");
 S.shT-=dt;S.shCd-=dt;S.boost-=dt;S.frost-=dt;S.umb-=dt;S.mag-=dt;S.gold-=dt;S.comboT-=dt;if(S.comboT<=0)S.combo=0;
-var cm=S.h/8,sn=!CFG.seas?0:cm<60?0:cm<140?1:cm<240?2:3;
-if(sn!==S.sn){S.sn=sn;if(sn>0){ban(SEAS[sn].i+" "+SEAS[sn].n);sfx("season")}}
+var cm=S.h/8,sn=!CFG.seas||MP.ns?0:stgI(cm),zn=MP.space?(cm<80?0:cm<170?1:cm<270?2:cm<380?3:4):0;
+if(zn!==S.zn){S.zn=zn;if(MP.space){ban(ZN[zn].i+" "+ZN[zn].n);sfx("season")}}
+var ri=rankIdx(cm);if(ri>S.rkI){S.rkI=ri;if(CFG.ml){eN.textContent="⭐ New rank: "+RANKS[ri][1];eN.classList.add("on");S.nt=2.6;sfx("pu")}}
+if(sn!==S.sn){S.sn=sn;if(sn>0){ban(STG[sn].i+" "+STG[sn].n);sfx("season")}}
 if(CFG.thirst){S.thirst=Math.max(0,S.thirst-dt*.026*(sn===1?1.3:1)*P.th*(mp.th||1));if(S.thirst<.3)hint("thirst","Thirsty! Catch 💧 or your growth slows.")}else S.thirst=1;
-S.h+=(30+Math.min(S.h/60,30)+(S.boost>0?55:0))*(S.frost>0&&!P.nf?.5:1)*m.sp*P.gr*(mp.gr||1)*(S.thirst<=0?.55:1)*(CFG.combo?1+Math.min(S.combo,8)*.05:1)*(sn===3?.92:1)*dt;
+S.h+=(30+Math.min(S.h/60,30)+(S.boost>0?55:0))*(S.frost>0&&!P.nf?.5:1)*m.sp*P.gr*(mp.gr||1)*(MP.space?ZG[zn]:1)*(S.thirst<=0?.55:1)*(CFG.combo?1+Math.min(S.combo,8)*.05:1)*SG[sn]*dt;
 S.top=Math.max(S.top,S.h);if(LV&&S.h>=LV.tgt*8){win();return}
 while(S.xs.length*4<=S.h)S.xs.push(S.x);
 var hz=m.hz,calm=S.gold>0,hd=calm?0:dt;
 S.gdT-=dt;if(CFG.giant&&S.gdT<=0&&S.h>480&&S.gold<=0){S.gdT=40+rnd()*15;S.gold=10;S.storm=0;ban("☀️ Golden hour!")}
-if(S.storm>0){S.hailT-=dt;if(S.hailT<=0){S.hailT=.45*hz;S.hl.push({x:clamp(S.x+(rnd()-.5)*420,20,W-20),hp:S.h+H*.62+30});hint("hail","🧊 Hail! Slip sideways.")}
+if(S.storm>0){S.hailT-=dt;if(S.hailT<=0){S.hailT=.45*hz;S.hl.push({x:clamp(S.x+(rnd()-.5)*420,20,W-20),hp:S.h+H*.62+30});hint("hail",(MP.space||S.sn>=6)?"☄️ Meteors! Slip sideways.":"🧊 Hail! Slip sideways.")}
 S.storm-=dt;S.wind=Math.sin(S.t*1.4)*120+Math.sin(S.t*.5)*60;S.ltT-=dt;
-if(S.ltT<=0){S.ltT=2.2*hz;S.ev.push({k:"bolt",tx:clamp(S.x+(rnd()-.5)*260,40,W-40),t:0,dur:1.1*m.w,id:rnd()*99,r:32});hint("bolt","⚡ Lightning marks its line first. Step aside.")}
-if(S.storm<=0)S.stormT=(12+rnd()*8)*hz*(sn===1?.7:1)*(mp.st||1)}
-else{S.wind=lerp(S.wind,sn===2?Math.sin(S.t*.9)*50:0,Math.min(1,dt*3));S.stormT-=hd;if(S.stormT<=0&&S.h>80&&!calm&&hzOn("storm")){S.storm=9;S.ltT=1.5}}
-S.x=clamp(S.x+(S.tx-S.x)*Math.min(1,dt*9)+(S.umb>0?0:S.wind*(mp.wd||1))*dt,34,W-34);
+if(S.ltT<=0){S.ltT=2.2*hz;S.ev.push({k:"bolt",tx:clamp(S.x+(rnd()-.5)*260,40,W-40),t:0,dur:1.1*m.w,id:rnd()*99,r:32});hint("bolt",(MP.space||S.sn>=6)?"☀️ Solar flare! Leave the marked line.":"⚡ Lightning marks its line first. Step aside.")}
+if(S.storm<=0)S.stormT=(12+rnd()*8)*hz*(sn===1||MP.space&&zn===2?.7:sn===4?.8:sn>=6?.75:1)*(mp.st||1)}
+else{S.wind=lerp(S.wind,sn===2?Math.sin(S.t*.9)*50:sn===4?Math.sin(S.t*.9)*30:MP.space?(zn===1?Math.sin(S.t*.8)*60:0):(mp.gust||0)*Math.sin(S.t*.8)*60,Math.min(1,dt*3));S.stormT-=hd;if(S.stormT<=0&&S.h>80&&!calm&&hzOn("storm")){S.storm=9;S.ltT=1.5}}
+S.x=clamp(S.x+(S.tx-S.x)*Math.min(1,dt*9)+(S.umb>0?0:S.wind*(mp.wd==null?1:mp.wd))*dt,34,W-34);
 S.garT-=hd;if(S.garT<=0&&S.h>60&&hzOn("snip")){S.garT=(Math.max(2,6-S.h/350)+rnd()*2)*hz;S.ev.push({k:"snip",tx:S.x,t:0,dur:1.5*m.w,r:48});hint("snip","✂️ A gardener! Leave the "+(CFG.cb?"blue":"red")+" ring before it snaps.")}
 S.birdT-=hd;if(S.birdT<=0&&S.h>120&&hzOn("bird")){S.birdT=(7+rnd()*4)*hz;S.ev.push({k:"bird",tx:S.x+(rnd()-.5)*60,t:0,dur:1.2*m.w,dir:rnd()<.5?-1:1,r:42});hint("bird","🐦 A bird is diving. Dodge its target.")}
 S.vineT-=hd;if(S.vineT<=0&&S.h>200&&hzOn("vine")){S.vineT=(9+rnd()*5)*hz*(mp.vn||1);S.vn.push({hp:S.h+H*.62+40,gx:W*.2+rnd()*W*.6,ph:rnd()*6,gw:Math.max(120,190-S.h/20)*(mode==="easy"?1.25:1)});hint("vine","🌿 Thorn vines: grow through the gap.")}
-S.fT-=hd;if(S.fT<=0&&S.h>100&&hzOn("frost")){S.fT=(8+rnd()*4)*hz*(sn===3?.5:1)*(mp.fz||1);S.fz.push({x:rnd()*W,hp:S.h+H*.62+40,vx:(rnd()<.5?-1:1)*(30+rnd()*40)});hint("frost","❄️ Frost slows you. Steer around it.")}
+S.fT-=hd;if(S.fT<=0&&S.h>100&&hzOn("frost")){S.fT=(8+rnd()*4)*hz*(sn===3||sn===5||MP.space&&zn===3?.5:1)*(mp.fz||1);S.fz.push({x:rnd()*W,hp:S.h+H*.62+40,vx:(rnd()<.5?-1:1)*(30+rnd()*40)});hint("frost","❄️ Frost slows you. Steer around it.")}
 S.giT-=hd;if(CFG.giant&&S.giT<=0&&S.h>800&&hzOn("giant")){S.giT=(26+rnd()*10)*hz;S.ev.push({k:"giant",tx:S.x,t:0,dur:2.2*m.w,r:Math.min(150,W*.3)});hint("giant","⚠️ Giant gardener! Run far from the ring.")}
 S.ev.forEach(function(e){e.t+=dt;
 if(!e.done&&e.t>=e.dur){e.done=true;if(e.k==="bolt"){S.flash=CFG.rm?.2:.9;S.shake=CFG.rm?0:.35;sfx("bolt")}else sfx("snip");
@@ -259,28 +315,50 @@ g.fillStyle=fc;g.beginPath();g.arc(-r*.28,-r*.12,r*.1,0,6.283);g.arc(r*.28,-r*.1
 g.strokeStyle=fc;g.lineWidth=2;g.beginPath();
 if(danger)g.arc(0,r*.28,r*.12,0,6.283);else g.arc(0,r*.08,r*.3,.2,2.94);
 g.stroke();g.restore()}
+function planet(t,x,y,r){g.save();g.translate(x,y);
+if(t==="galaxy"){g.save();g.rotate(-.5);for(var ga=0;ga<4;ga++){g.rotate(1.5708);var gg2=g.createRadialGradient(r*.5,0,0,r*.5,0,r*.9);gg2.addColorStop(0,"rgba(190,160,255,.55)");gg2.addColorStop(1,"rgba(120,80,220,0)");g.fillStyle=gg2;g.beginPath();g.ellipse(r*.5,0,r*.9,r*.28,.5,0,6.283);g.fill()}var gc=g.createRadialGradient(0,0,0,0,0,r*.35);gc.addColorStop(0,"rgba(255,245,210,.95)");gc.addColorStop(1,"rgba(255,220,160,0)");g.fillStyle=gc;g.beginPath();g.arc(0,0,r*.35,0,6.283);g.fill();g.restore();g.restore();return}
+if(t==="saturn"){g.save();g.rotate(-.35);g.strokeStyle="rgba(230,205,150,.55)";g.lineWidth=r*.28;g.beginPath();g.ellipse(0,0,r*1.9,r*.55,0,Math.PI,6.283);g.stroke();g.restore()}
+var cs=({earth:["#7fd0ff","#1d6fd1"],mars:["#f08a5d","#b3402b"],jupiter:["#f3d9b1","#c98a4b"],saturn:["#f6e3b0","#d9b46a"],neptune:["#8fb8ff","#3b5bdb"],moon:["#e5e5ee","#8e8ea0"]})[t],gg=g.createRadialGradient(-r*.35,-r*.35,r*.1,0,0,r);gg.addColorStop(0,cs[0]);gg.addColorStop(1,cs[1]);g.fillStyle=gg;g.beginPath();g.arc(0,0,r,0,6.283);g.fill();
+g.save();g.beginPath();g.arc(0,0,r,0,6.283);g.clip();
+if(t==="earth"){g.fillStyle="rgba(80,190,110,.85)";g.beginPath();g.ellipse(-r*.3,-r*.1,r*.35,r*.25,.5,0,6.283);g.ellipse(r*.35,r*.3,r*.25,r*.3,-.4,0,6.283);g.fill();g.fillStyle="rgba(255,255,255,.55)";g.beginPath();g.ellipse(r*.1,-r*.45,r*.4,r*.1,.2,0,6.283);g.fill()}
+else if(t==="jupiter"||t==="saturn"){for(var b=-3;b<=3;b++){g.fillStyle=b%2?"rgba(190,120,70,.35)":"rgba(255,235,200,.3)";g.fillRect(-r,b*r*.28-r*.07,r*2,r*.16)}if(t==="jupiter"){g.fillStyle="rgba(200,70,50,.75)";g.beginPath();g.ellipse(r*.3,r*.3,r*.2,r*.12,0,0,6.283);g.fill()}}
+else if(t==="mars"){g.fillStyle="rgba(120,40,30,.4)";g.beginPath();g.ellipse(-r*.2,r*.1,r*.4,r*.2,.4,0,6.283);g.fill();g.fillStyle="rgba(255,255,255,.7)";g.beginPath();g.ellipse(0,-r*.9,r*.35,r*.15,0,0,6.283);g.fill()}
+else if(t==="moon"){g.fillStyle="rgba(90,90,110,.35)";[[-.3,-.2,.2],[.3,.15,.15],[-.1,.45,.12]].forEach(function(c){g.beginPath();g.arc(c[0]*r,c[1]*r,c[2]*r,0,6.283);g.fill()})}
+g.restore();
+var sh=g.createRadialGradient(r*.5,r*.5,r*.2,0,0,r*1.05);sh.addColorStop(0,"rgba(0,0,20,0)");sh.addColorStop(1,"rgba(0,0,30,.45)");g.fillStyle=sh;g.beginPath();g.arc(0,0,r,0,6.283);g.fill();
+if(t==="saturn"){g.save();g.rotate(-.35);g.strokeStyle="rgba(240,220,170,.75)";g.lineWidth=r*.28;g.beginPath();g.ellipse(0,0,r*1.9,r*.55,0,0,Math.PI);g.stroke();g.restore()}
+g.restore()}
 function deco(gy){var k=MP.key,i,x;
 if(k==="desert"){g.fillStyle="#4f9a52";for(i=0;i<3;i++){x=W*(.15+i*.35);g.fillRect(x-7,gy-62,14,64);g.fillRect(x-22,gy-44,10,8);g.fillRect(x-22,gy-58,8,22);g.fillRect(x+12,gy-34,10,8);g.fillRect(x+16,gy-50,8,24)}}
 else if(k==="forest"){g.fillStyle="rgba(38,92,58,.9)";for(i=0;i<4;i++){x=W*(.08+i*.28);g.fillRect(x-11,gy-300,22,310);g.beginPath();g.arc(x,gy-300,46,0,6.283);g.fill()}}
+else if(k==="space"){g.fillStyle="rgba(0,0,0,.2)";for(i=0;i<5;i++){x=W*(.1+i*.2);g.beginPath();g.ellipse(x,gy+22,38+i%2*14,9,0,0,6.283);g.fill()}g.fillStyle="#cfd2e6";g.fillRect(W*.82,gy-46,4,48);g.fillStyle="#ff6b9a";g.beginPath();g.moveTo(W*.82+4,gy-46);g.lineTo(W*.82+30,gy-38);g.lineTo(W*.82+4,gy-30);g.fill()}
+else if(k==="mars"){g.fillStyle="#8a3b25";for(i=0;i<5;i++){x=W*(.08+i*.22);g.beginPath();g.ellipse(x,gy+4,24+i%3*10,13+i%2*5,0,0,6.283);g.fill()}g.fillStyle="rgba(130,55,35,.8)";g.fillRect(W*.6,gy-70,W*.2,80);g.fillRect(W*.64,gy-96,W*.12,30)}
 else if(k==="mountain"){for(i=0;i<4;i++){x=i*W*.3-40;var ph=150+(i%2)*70;g.fillStyle="#a5b2c9";g.beginPath();g.moveTo(x,gy+10);g.lineTo(x+W*.22,gy-ph);g.lineTo(x+W*.44,gy+10);g.fill();g.fillStyle="#fff";g.beginPath();g.moveTo(x+W*.22,gy-ph);g.lineTo(x+W*.22-34,gy-ph+46);g.lineTo(x+W*.22+34,gy-ph+46);g.fill()}}}
 function draw(){
-var f=clamp(S.h/3000,0,1),bs=H*.62,sk=!(CFG.rm||S.shake<=0),sx=sk?(vr()-.5)*S.shake*18:0,sy0=sk?(vr()-.5)*S.shake*18:0,cmv=S.h/8,WC=CFG.cb?"#0072b2":"#ff4d4d";
+var spc=MP.space||S.sn>=6,sa=MP.space?1:CFG.seas&&!MP.ns?clamp((S.h/8-560)/80,0,1):0,f=clamp(S.h/3000,0,1),bs=H*.62,sk=!(CFG.rm||S.shake<=0),sx=sk?(vr()-.5)*S.shake*18:0,sy0=sk?(vr()-.5)*S.shake*18:0,cmv=S.h/8,WC=CFG.cb?"#0072b2":"#ff4d4d";
 function sy(hp){return bs+(S.h-hp)+sy0}
+function spaceBg(a){var i,x,y,l,tw;g.globalAlpha=a;
+[[.2,.25,260,"rgba(160,60,200,.18)"],[.8,.55,300,"rgba(60,110,230,.15)"],[.4,.85,240,"rgba(230,80,150,.12)"]].forEach(function(n,k){var yy=((n[1]*H+S.h*.12+k*300)%(H+600))-300,gg=g.createRadialGradient(n[0]*W,yy,0,n[0]*W,yy,n[2]);gg.addColorStop(0,n[3]);gg.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=gg;g.fillRect(0,0,W,H)});
+for(i=0;i<130;i++){l=i%3;x=(i*131)%W;y=((i*79)+S.h*(.08+l*.07))%H;tw=.5+.5*Math.sin(S.t*2+i);g.fillStyle="rgba(255,255,255,"+(.35+tw*.55*(l+1)/3)+")";g.fillRect(x,y,1+l*.6,1+l*.6)}
+var ps=Math.min(1,W/420);
+var off=MP.space?0:4400;PL.forEach(function(p){var yy=bs+(S.h-p.hp-off)*.3+sy0;if(yy<-300||yy>H+300)return;planet(p.t,p.x*W+sx,yy,p.r*ps)});g.globalAlpha=1}
 var gr=g.createLinearGradient(0,0,0,H);
-if(CFG.seas){var ix=cmv<60?0:cmv<140?1:cmv<240?2:3,ed=[0,60,140,240],pv=Math.max(ix-1,0),tt=ix>0?clamp((cmv-ed[ix])/14,0,1):1;gr.addColorStop(0,mix(SEAS[pv].t,SEAS[ix].t,tt));gr.addColorStop(1,mix(SEAS[pv].b,SEAS[ix].b,tt))}
+if(MP.space){gr.addColorStop(0,mix([5,6,26],[2,2,12],f));gr.addColorStop(1,mix([52,24,96],[18,12,50],f))}else if(CFG.seas&&!MP.ns){var si=stgI(cmv),pv=Math.max(si-1,0),tt=si>0?clamp((cmv-STG[si].f)/STG[si].w,0,1):1;gr.addColorStop(0,mix(STG[pv].t,STG[si].t,tt));gr.addColorStop(1,mix(STG[pv].b,STG[si].b,tt))}
 else{gr.addColorStop(0,mix([126,205,255],[34,38,96],f));gr.addColorStop(1,mix([255,236,210],[120,90,170],f))}
 g.fillStyle=gr;g.fillRect(0,0,W,H);
-if(CFG.seas){g.fillStyle="rgba(15,15,60,"+f*.5+")";g.fillRect(0,0,W,H)}
+if(CFG.seas&&!MP.ns){g.fillStyle="rgba(15,15,60,"+f*.5*(1-sa)+")";g.fillRect(0,0,W,H)}
 if(MP.tint){g.fillStyle=MP.tint;g.fillRect(0,0,W,H)}
-var sf=MP.key==="night"?Math.max(f,.85):f;if(sf>.35){g.fillStyle="rgba(255,255,255,"+(sf-.35)*1.2+")";for(var s=0;s<50;s++)g.fillRect((s*137)%W,(s*89+S.t*2)%(H*.7),1.6,1.6)}
+var sf=MP.key==="night"?Math.max(f,.85):sa>0?0:f;if(sf>.35){g.fillStyle="rgba(255,255,255,"+(sf-.35)*1.2+")";for(var s=0;s<50;s++)g.fillRect((s*137)%W,(s*89+S.t*2)%(H*.7),1.6,1.6)}
 g.fillStyle=MP.key==="night"?"rgba(235,238,255,.95)":"rgba(255,226,140,.9)";g.beginPath();g.arc(W*.8,H*.17+f*50,34,0,6.283);g.fill();
 g.fillStyle=MP.key==="night"?"rgba(200,210,255,.2)":"rgba(255,226,140,.2)";g.beginPath();g.arc(W*.8,H*.17+f*50,66,0,6.283);g.fill();
-for(var c=0;c<7;c++)cloud(((c*263+S.t*(6+c*2))%(W+300))-150,((c*211+S.h*.3)%(H+200))-100,.9+(c%3)*.3,.8);
+if(sa>0)spaceBg(sa);
+if(S.sn===5&&CFG.seas&&!MP.ns){for(var ai=0;ai<3;ai++){g.strokeStyle=ai%2?"rgba(150,120,255,.16)":"rgba(100,255,190,.2)";g.lineWidth=38-ai*8;g.beginPath();for(var ax=-10;ax<=W+10;ax+=14){var ay=H*(.18+ai*.1)+Math.sin(ax*.012+S.t*.8+ai*2)*34+Math.sin(ax*.03-S.t*.5)*12;g[ax<0?"moveTo":"lineTo"](ax,ay)}g.stroke()}}
+if(sa<1)for(var c=0;c<7;c++)cloud(((c*263+S.t*(6+c*2))%(W+300))-150,((c*211+S.h*.3)%(H+200))-100,.9+(c%3)*.3,.8*(1-sa));
 var gy=sy(0);
 if(gy<H+260){
 var fy=bs-30+S.h*.55+sy0;g.fillStyle=mix(MP.hill[0],[70,70,120],f);g.beginPath();g.moveTo(0,H+300);for(var x=0;x<=W;x+=20)g.lineTo(x,fy-Math.sin(x*.008)*40-Math.sin(x*.02)*14);g.lineTo(W,H+300);g.fill();
 deco(gy);g.fillStyle=mix(MP.hill[1],[50,60,100],f);g.beginPath();g.moveTo(0,H+300);for(x=0;x<=W;x+=20)g.lineTo(x,gy-Math.sin(x*.012+1)*26);g.lineTo(W,H+300);g.fill();
-g.fillStyle="#fff8ec";for(x=10;x<W;x+=62){g.fillRect(x,gy-34,9,42)}g.fillRect(0,gy-22,W,6);
+if(!MP.nf){g.fillStyle="#fff8ec";for(x=10;x<W;x+=62){g.fillRect(x,gy-34,9,42)}g.fillRect(0,gy-22,W,6)}
 var sg=g.createLinearGradient(0,gy,0,gy+260);sg.addColorStop(0,MP.soil[0]);sg.addColorStop(1,MP.soil[1]);g.fillStyle=sg;g.fillRect(0,gy+4,W,H);
 g.fillStyle=MP.grass;g.fillRect(0,gy,W,8);
 }
@@ -289,8 +367,16 @@ var first=true;
 for(var i=0;i*4<=S.h;i++){var hp=i*4,y=sy(hp);if(y>H+30)continue;if(y<-30)break;var xx=S.xs[i]+Math.sin(S.t*1.6+hp*.02)*clamp(2+hp*.004,2,7)+sx;g[first?"moveTo":"lineTo"](xx,y);first=false}
 g.lineTo(S.x+sx,bs+sy0);g.stroke();
 for(var hp2=60,k=0;hp2<S.h-30;hp2+=85,k++){var yy=sy(hp2);if(yy<-30||yy>H+30)continue;leaf(S.xs[Math.floor(hp2/4)]+sx,yy,k%2?1:-1,Math.sin(S.t*1.6+k))}
+if(CFG.ml){var lb=MP.space?ZN.slice(1).map(function(z,i){return[[80,170,270,380][i],z]}):CFG.seas&&!MP.ns?STG.slice(1).map(function(s2){return[s2.f,s2]}):[];
+g.textBaseline="middle";
+lb.forEach(function(e){var y=sy(e[0]*8);if(y<-20||y>H+20)return;g.save();g.globalAlpha=.55;g.strokeStyle="#fff";g.lineWidth=2;g.setLineDash([8,8]);g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke();g.restore();g.textAlign="right";g.font="800 13px Nunito,sans-serif";g.lineWidth=4;g.strokeStyle="rgba(20,20,60,.45)";g.fillStyle="#fff";g.strokeText(e[1].i+" "+e[1].n,W-10,y-12);g.fillText(e[1].i+" "+e[1].n,W-10,y-12)});
+g.textAlign="left";g.font="800 11px Nunito,sans-serif";g.lineWidth=3;
+for(var fm=Math.max(1,Math.ceil((S.h-(H-bs))/400));fm*400<=S.h+bs;fm++){var fy2=sy(fm*400);g.fillStyle="rgba(255,255,255,.85)";g.fillRect(0,fy2-1,18,2);g.strokeStyle="rgba(20,20,60,.4)";g.strokeText(fm*50+" cm",22,fy2);g.fillStyle="#fff";g.fillText(fm*50+" cm",22,fy2)}
+g.textBaseline="alphabetic"}
 var danger=S.ev.some(function(e){return !e.done}),hr=16+Math.min(S.h/120,12),bx=S.x+sx,by2=bs+sy0;
 head(bx,by2,hr,danger);
+if(S.sn===4&&CFG.seas&&!MP.ns){g.globalAlpha=.78;for(var cl2=0;cl2<12;cl2++){var cy=sy(2720+cl2*90);if(cy<-80||cy>H+80)continue;cloud(((cl2*277)%(W+160))-60+Math.sin(S.t*.3+cl2)*20,cy,1.6+(cl2%3)*.5,.9)}g.globalAlpha=1}
+if(spc){g.fillStyle="rgba(170,215,255,.18)";g.strokeStyle="rgba(200,230,255,.7)";g.lineWidth=3;g.beginPath();g.arc(bx,by2,hr*2.1,0,6.283);g.fill();g.stroke();g.strokeStyle="rgba(255,255,255,.6)";g.beginPath();g.arc(bx,by2,hr*1.8,3.6,4.5);g.stroke()}
 if(S.frost>0){g.fillStyle="rgba(170,225,255,.35)";g.beginPath();g.arc(bx,by2,42,0,6.283);g.fill()}
 if(S.mag>0){g.strokeStyle="rgba(157,78,221,"+(.18+Math.sin(S.t*6)*.08)+")";g.lineWidth=3;g.setLineDash([6,8]);g.beginPath();g.arc(bx,by2,170,0,6.283);g.stroke();g.setLineDash([])}
 if(S.shT>0){g.fillStyle="rgba(126,224,143,.25)";g.strokeStyle="rgba(90,200,120,.9)";g.lineWidth=4;g.beginPath();g.arc(bx,by2,hr*2.3,0,6.283);g.fill();g.stroke()}
@@ -302,7 +388,7 @@ else if(p.ty==="w"){g.fillStyle="rgba(110,198,255,.28)";g.beginPath();g.arc(p.x,
 else{g.fillStyle="rgba(255,255,255,.55)";g.beginPath();g.arc(p.x,y,24+Math.sin(S.t*5)*2,0,6.283);g.fill();g.strokeStyle="#c77dff";g.lineWidth=2.5;g.stroke();g.font="26px sans-serif";g.textAlign="center";g.fillText(({f:"🧪",u:"☂️",l:"🐞",m:"🧲"})[p.ty],p.x,y+9)}});
 S.vn.forEach(function(v){var y=sy(v.hp);if(y<-30||y>H+30)return;g.lineCap="round";[[-10,v.cx-v.gw/2],[v.cx+v.gw/2,W+10]].forEach(function(r){g.strokeStyle="#2f7d3a";g.lineWidth=14;g.beginPath();for(var x=r[0];x<=r[1];x+=10)g[x===r[0]?"moveTo":"lineTo"](x,y+Math.sin(x*.05)*4);g.stroke();g.fillStyle="#1f5a2a";for(x=r[0]+8;x<r[1]-8;x+=34){g.beginPath();g.moveTo(x,y-5);g.lineTo(x+6,y-20);g.lineTo(x+12,y-5);g.fill()}})});
 S.fz.forEach(function(z){var y=sy(z.hp),fg=g.createRadialGradient(z.x,y,4,z.x,y,50);fg.addColorStop(0,"rgba(220,245,255,.95)");fg.addColorStop(1,"rgba(150,210,255,0)");g.fillStyle=fg;g.beginPath();g.arc(z.x,y,50,0,6.283);g.fill();g.font="26px sans-serif";g.textAlign="center";g.fillText("❄️",z.x,y+9)});
-S.hl.forEach(function(p){var y=sy(p.hp);g.strokeStyle="rgba(220,240,255,.6)";g.lineWidth=3;g.beginPath();g.moveTo(p.x,y);g.lineTo(p.x,y-22);g.stroke();g.fillStyle="#e8f6ff";g.beginPath();g.arc(p.x,y,8,0,6.283);g.fill()});
+S.hl.forEach(function(p){var y=sy(p.hp);if(spc){var tg2=g.createLinearGradient(p.x,y,p.x,y-46);tg2.addColorStop(0,"rgba(255,160,60,.9)");tg2.addColorStop(1,"rgba(255,80,40,0)");g.strokeStyle=tg2;g.lineWidth=9;g.beginPath();g.moveTo(p.x,y);g.lineTo(p.x,y-46);g.stroke();g.fillStyle="#8a7f78";g.beginPath();g.arc(p.x,y,10,0,6.283);g.fill();g.fillStyle="#5c534e";g.beginPath();g.arc(p.x-3,y-2,3,0,6.283);g.fill();return}g.strokeStyle="rgba(220,240,255,.6)";g.lineWidth=3;g.beginPath();g.moveTo(p.x,y);g.lineTo(p.x,y-22);g.stroke();g.fillStyle="#e8f6ff";g.beginPath();g.arc(p.x,y,8,0,6.283);g.fill()});
 S.ev.forEach(function(e){var p=clamp(e.t/e.dur,0,1);
 if(e.k==="snip"||e.k==="giant"){var kk=e.k==="giant"?2.2:1,ty=bs-8+sy0,pulse=1+Math.sin(S.t*14)*.08;
 if(!e.done||e.t<e.dur+.25){var a=e.done?1-(e.t-e.dur)/.25:1;g.globalAlpha=Math.max(a,0);
@@ -315,18 +401,18 @@ else if(e.k==="bird"){var ty2=bs-6+sy0,bx0=e.tx+e.dir*(W*.55+120),by0=-70,e3=p*p
 g.save();g.translate(bxp,byp);g.scale(-e.dir,1);g.fillStyle="#6b4a8a";g.beginPath();g.ellipse(0,0,20,12,.3,0,6.283);g.fill();g.fillStyle="#ffb300";g.beginPath();g.moveTo(18,-2);g.lineTo(34,2);g.lineTo(18,6);g.fill();var fl=Math.sin(S.t*30)*14;g.fillStyle="#8a63ad";g.beginPath();g.moveTo(-4,0);g.lineTo(-18,-16-fl);g.lineTo(8,-6);g.fill();g.fillStyle="#fff";g.beginPath();g.arc(10,-4,3,0,6.283);g.fill();g.restore();g.globalAlpha=1}
 else{var a2=e.done?1-(e.t-e.dur)/.45:.35+p*.5;g.globalAlpha=Math.max(a2,0);
 if(!e.done){g.strokeStyle=CFG.cb?"#f0e442":"#fff3a0";g.lineWidth=3;g.setLineDash([6,10]);g.beginPath();g.moveTo(e.tx,0);g.lineTo(e.tx,bs+14);g.stroke();g.setLineDash([])}
-else{g.strokeStyle="#fffbd0";g.lineWidth=7;g.beginPath();g.moveTo(e.tx,0);var bb=0,sd=e.id;while(bb<bs+10){bb+=34;sd=(sd*9301+49297)%233280;g.lineTo(e.tx+(sd/233280-.5)*50,bb)}g.stroke()}
+else{g.strokeStyle=spc?"#ffc2f0":"#fffbd0";g.lineWidth=spc?12:7;g.beginPath();g.moveTo(e.tx,0);var bb=0,sd=e.id;while(bb<bs+10){bb+=34;sd=(sd*9301+49297)%233280;g.lineTo(e.tx+(sd/233280-.5)*50,bb)}g.stroke()}
 g.globalAlpha=1}});
 S.pt.forEach(function(q){g.globalAlpha=clamp(q.l,0,1);g.fillStyle=q.c;g.beginPath();g.arc(q.x,sy(q.hp),3.5,0,6.283);g.fill()});g.globalAlpha=1;
 g.textAlign="center";g.font="800 17px Nunito,sans-serif";g.lineWidth=4;g.strokeStyle="rgba(20,20,60,.35)";g.fillStyle="#fff";
 S.ft.forEach(function(t){g.globalAlpha=clamp(t.l,0,1);var tx=t.x+sx,tyy=sy(t.hp);g.strokeText(t.s,tx,tyy);g.fillText(t.s,tx,tyy)});g.globalAlpha=1;
 if(S.gold>0){var ga=clamp(Math.min(S.gold,10-S.gold),0,1);g.fillStyle="rgba(255,200,90,"+ga*.2+")";g.fillRect(0,0,W,H);g.fillStyle="rgba(255,235,150,"+ga*.13+")";for(var j=0;j<5;j++){var x1=-W*.2+j*W*.28;g.beginPath();g.moveTo(W*.8,H*.17);g.lineTo(x1,H);g.lineTo(x1+W*.13,H);g.fill()}}
-if(S.sm>.01){g.fillStyle="rgba(24,28,70,"+S.sm*.32+")";g.fillRect(0,0,W,H);g.strokeStyle="rgba(210,225,255,"+S.sm*.55+")";g.lineWidth=1.5;g.beginPath();for(var q2=0;q2<110;q2++){var rx=(q2*97+S.t*160*(1+q2%3*.2))%(W+200)-100,ry=(q2*61+S.t*620)%H;g.moveTo(rx,ry);g.lineTo(rx-9,ry+22)}g.stroke()}
+if(S.sm>.01){g.fillStyle=spc?"rgba(90,20,60,"+S.sm*.12+")":"rgba(24,28,70,"+S.sm*.32+")";g.fillRect(0,0,W,H);g.strokeStyle=spc?"rgba(255,170,90,"+S.sm*.7+")":"rgba(210,225,255,"+S.sm*.55+")";g.lineWidth=1.5;g.beginPath();for(var q2=0;q2<110;q2++){var rx=(q2*97+S.t*160*(1+q2%3*.2))%(W+200)-100,ry=(q2*61+S.t*620)%H;g.moveTo(rx,ry);g.lineTo(rx-9,ry+22)}g.stroke()}
 if(CFG.seas&&(S.sn===2||S.sn===3)){var sn3=S.sn===3,cnt=sn3?70:34;for(var pi2=0;pi2<cnt;pi2++){var px=((pi2*97+S.t*(sn3?18:34)*(1+pi2%3*.4)+Math.sin(S.t*1.3+pi2)*24)%(W+60))-30,py=(pi2*53+S.t*(sn3?55:70)*(1+pi2%4*.15))%H;if(sn3){g.fillStyle="rgba(255,255,255,.85)";g.beginPath();g.arc(px,py,1.8+pi2%3,0,6.283);g.fill()}else{g.fillStyle=pi2%2?"#e07a2f":"#c4452d";g.save();g.translate(px,py);g.rotate(S.t+pi2);g.beginPath();g.ellipse(0,0,6,3,0,0,6.283);g.fill();g.restore()}}}
 if(S.ban){g.globalAlpha=clamp(Math.min(S.ban.t,2.6-S.ban.t)*2,0,1);g.font="900 30px Fraunces,Georgia,serif";g.lineWidth=6;g.strokeStyle="rgba(20,20,60,.4)";g.fillStyle="#fff";g.strokeText(S.ban.s,W/2,H*.3);g.fillText(S.ban.s,W/2,H*.3);g.globalAlpha=1}
 if(S.flash>0){g.fillStyle="rgba(255,255,255,"+clamp(S.flash,0,1)*(CFG.rm?.25:.8)+")";g.fillRect(0,0,W,H)}
-var cm=Math.floor(S.h/8),key=cm+"|"+S.sn+"|"+CFG.seas;
-if(key!==lastcm){lastcm=key;eH.innerHTML=cm+"<small> cm</small>";eR.textContent=rank(cm)+(CFG.seas?" · "+SEAS[S.sn].n:"")}
+var cm=Math.floor(S.h/8),key=cm+"|"+S.sn+"|"+CFG.seas+"|"+S.zn+MP.key;
+if(key!==lastcm){lastcm=key;eH.innerHTML=cm+"<small> cm</small>";eR.textContent=rank(cm)+(MP.space?" · "+ZN[S.zn].n:CFG.seas&&!MP.ns?" · "+STG[S.sn].n:"")}
 eB.style.width=clamp(S.boost/4,0,1)*100+"%";
 eWW.style.display=CFG.thirst?"":"none";eW.style.width=S.thirst*100+"%";eW.classList.toggle("low",S.thirst<.25);
 var ct=CFG.combo&&S.combo>=2?"🔥 x"+(1+Math.min(S.combo,8)*.05).toFixed(2)+" · "+S.combo:"";eC.textContent=ct;eC.style.display=ct?"block":"none";
@@ -343,63 +429,64 @@ recv:function(){if(!S.on||!CFG.sab)return;S.ev.push({k:"bird",tx:S.x+(vr()-.5)*6
 start:function(seed,m,lb,opt){o=opt||{};mode=m;label=lb;var F=FL[o.fl]||FL.poppy,U=o.up||{petal:0,reach:0,shield:0,roots:0};P={F:F,lv:F.lv+U.petal,gr:F.gr*(1+.05*U.roots),sh:(F.sh||1)*Math.pow(.88,U.shield),reach:U.reach,bm:F.bm||1,th:F.th||1,nf:F.nf||0,wx:F.wx||1,sb:F.sb||1};LV=o.lvl?LEVELS[o.lvl-1]:null;MP=MAPS[LV?LV.map:o.map]||MAPS.meadow;mp=MP.mod||{};MM={sp:M[mode].sp,hz:M[mode].hz,cut:M[mode].cut,w:M[mode].w*P.wx};rk=0;size();rnd=seeded(seed);reset();var bs=o.daily?SV.daily:SV.best;best=bs[o.daily?dkey():mode]||0;nb=false;paused=false;S.on=true;eO.style.display="none";eN.classList.remove("on");lastcm="";hint("steer","Steer with ← → or drag. Catch 💧 to grow faster.");if(LV)ban("Level "+o.lvl+": "+LV.n);else if(MP.key!=="meadow")ban(MP.n)}}
 }
 
-var g1=Game($("pane1"),onEnd),g2=Game($("pane2"),onEnd),cur=[g1],UI={page:"main",back:"main",daily:false};
+var g1=Game($("pane1"),onEnd,pause),g2=Game($("pane2"),onEnd,pause),cur=[g1],UI={page:"main",back:"main",daily:false};
 function onEnd(){if(cur.every(function(x){return x.done()})){AU.on=false;UI.page=cur.length>1?"over2":"over";render()}}
 function B(id,fn){var e=$(id);if(e)e.onclick=fn}
 function blur(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
 function go(p,back){UI.page=p;if(back)UI.back=back;render()}
-function mh(){var a='<div class="modes">'+[["easy","Easy","Chill growth"],["medium","Medium","Brisk"],["hard","Hard","Chaos"]].map(function(m){return '<button class="mb'+(CFG.mode===m[0]?" on":"")+'" data-m="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>';
-return a+'<div class="modes">'+[["1","1 Player","Solo climb"],["2","2 Players","Split-screen"]].map(function(m){return '<button class="mb'+((CFG.two?"2":"1")===m[0]?" on":"")+'" data-p="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>'+(CFG.two?'':'<div class="modes">'+[["inf","Infinite","Climb forever"],["lvl","Levels","Reach each goal"]].map(function(m){return '<button class="mb'+((CFG.kind||"inf")===m[0]?" on":"")+'" data-k="'+m[0]+'">'+m[1]+'<small>'+m[2]+'</small></button>'}).join("")+'</div>')}
-function bindModes(){[].forEach.call(document.querySelectorAll(".mb[data-m],.mb[data-p],.mb[data-k]"),function(b){b.onclick=function(){if(b.dataset.m)CFG.mode=b.dataset.m;else if(b.dataset.k)CFG.kind=b.dataset.k;else CFG.two=b.dataset.p==="2"?1:0;saveCfg();render()}})}
+function flowerSvg(f,s){var p="",k=f.fc||"#3a2a2a";for(var i=0;i<8;i++)p+='<ellipse cx="0" cy="-15" rx="8" ry="13" transform="rotate('+i*45+')" fill="'+f.c[i%2]+'"/>';return '<svg viewBox="-30 -30 60 60" width="'+s+'" height="'+s+'" aria-hidden="true">'+p+'<circle r="11" fill="'+f.ctr[1]+'"/><circle cx="-4" cy="-2" r="1.6" fill="'+k+'"/><circle cx="4" cy="-2" r="1.6" fill="'+k+'"/><path d="M-4 3Q0 7 4 3" stroke="'+k+'" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>'}
+var ICON={meadow:"🌼",desert:"🏜️",forest:"🌴",mountain:"🏔️",night:"🌙",mars:"🔴",space:"🪐"};
+function seg(items,attr,cur){return '<div class="seg">'+items.map(function(m){return '<button data-'+attr+'="'+m[0]+'" class="'+(String(cur)===m[0]?"on":"")+'">'+m[1]+(m[2]?'<small>'+m[2]+'</small>':'')+'</button>'}).join("")+'</div>'}
+function mh(){var h='<div class="lab">Difficulty</div>'+seg([["easy","Easy","Chill"],["medium","Medium","Brisk"],["hard","Hard","Chaos"]],"m",CFG.mode)+'<div class="lab">Players</div>'+seg([["1","1 Player","Solo"],["2","2 Players","Split-screen"]],"p",CFG.two?"2":"1");
+if(!CFG.two)h+='<div class="lab">Mode</div>'+seg([["inf","Infinite","Climb forever"],["lvl","Levels","Reach the goals"]],"k",CFG.kind||"inf");return h}
+function bindModes(){[].forEach.call(document.querySelectorAll(".seg button[data-m],.seg button[data-p],.seg button[data-k]"),function(b){b.onclick=function(){if(b.dataset.m)CFG.mode=b.dataset.m;else if(b.dataset.k)CFG.kind=b.dataset.k;else CFG.two=b.dataset.p==="2"?1:0;saveCfg();render()}})}
 function tg(k,b,s){return '<label class="tg"><span><b>'+b+'</b><small>'+s+'</small></span><input type="checkbox" data-k="'+k+'"'+(CFG[k]?" checked":"")+'></label>'}
 var HC=["Off","Player 1 gets +1 petal","Player 2 gets +1 petal"];
-function sets(){return '<div class="sec">Audio</div>'+tg("snd","Sound effects","Pickups, hits, shield, thunder")+tg("mus","Music","Soft ambient notes")+
-'<div class="sec">Gameplay features</div>'+tg("shield","Leaf shield","Space, ↑ or the 🍃 button blocks one hit")+tg("pu","Power-ups","Fertilizer, umbrella, ladybug, magnet")+tg("thirst","Thirst meter","Your flower droops without water")+tg("seas","Seasons","Spring to winter as you climb")+tg("giant","Giant events","Giant gardener and golden hour")+tg("combo","Combos and near misses","Chain pickups and skim hazards for bonuses")+tg("slow","Slow motion","Brief slow-mo on near misses")+
-'<div class="sec">Accessibility and help</div>'+tg("rm","Reduced motion","No shaking or flashes, fewer particles")+tg("cb","Colorblind-friendly warnings","Blue warnings with a ! marker")+tg("tut","Tutorial hints","Tips the first time something appears")+'<button class="mb ghost" id="rt" style="width:100%;margin-top:2px">Replay tutorial hints</button>'+
-'<div class="sec">Split-screen</div>'+tg("same","Same garden for both","Both players face identical hazards")+tg("sab","Sabotage","Combos send a diving bird at your rival")+'<button class="mb ghost" id="hc" style="width:100%">Handicap: '+HC[CFG.hcap]+'</button>'}
+function sets(){return '<div class="sec">Audio</div><div class="tgs">'+tg("snd","Sound effects","Pickups, hits, shield, thunder")+tg("mus","Music","Soft ambient notes")+'</div>'+
+'<div class="sec">Gameplay features</div><div class="tgs">'+tg("shield","Leaf shield","Space, ↑ or the 🍃 button blocks a hit")+tg("pu","Power-ups","Fertilizer, umbrella, ladybug, magnet")+tg("thirst","Thirst meter","Your flower droops without water")+tg("seas","Seasons and sky layers","Four seasons, then clouds, space and beyond")+tg("giant","Giant events","Giant gardener and golden hour")+tg("combo","Combos and near misses","Chain pickups, skim hazards")+tg("slow","Slow motion","Brief slow-mo on near misses")+tg("ml","Height labels","Rank-ups, height flags, layer markers")+'</div>'+
+'<div class="sec">Accessibility and help</div><div class="tgs">'+tg("rm","Reduced motion","No shaking or flashes")+tg("cb","Colorblind warnings","Blue warnings with a ! marker")+tg("tut","Tutorial hints","Tips the first time you see things")+'</div><button class="ghost wide" id="rt">Replay tutorial hints</button>'+
+'<div class="sec">Split-screen</div><div class="tgs">'+tg("same","Same garden for both","Identical hazards")+tg("sab","Sabotage","Combos send a bird to your rival")+'</div><button class="ghost wide" id="hc">Handicap: '+HC[CFG.hcap]+'</button>'}
 function bindSets(){[].forEach.call(document.querySelectorAll(".tg input"),function(i){i.onchange=function(){CFG[i.dataset.k]=i.checked?1:0;saveCfg()}});
 B("hc",function(){CFG.hcap=(CFG.hcap+1)%3;saveCfg();$("hc").textContent="Handicap: "+HC[CFG.hcap]});
 B("rt",function(){SEEN={};store("bloom-seen",SEEN);$("rt").textContent="Tutorial hints reset ✓"})}
+function shell(c,title,body,foot,back){c.innerHTML='<div class="ch"><button class="ghost back" id="bk" aria-label="Back">←</button><h2>'+title+'</h2><span class="chip">🌰 '+SV.seeds+'</span></div><div class="cb">'+body+'</div>'+(foot?'<div class="cf">'+foot+'</div>':'');B("bk",back||function(){go("main")})}
 function render(){var c=$("card"),p=UI.page;$("ov").classList.remove("hide");
-if(p==="main")main(c);else if(p==="green")green(c);else if(p==="settings"){c.innerHTML='<div class="logo">⚙️</div><h1 style="font-size:2.1rem">Settings</h1>'+sets()+'<button class="ghost" id="bk" style="width:100%;margin-top:12px">Back</button>';bindSets();B("bk",function(){go(UI.back||"main")})}
-else if(p==="pause"){c.innerHTML='<div class="logo">⏸️</div><h1 style="font-size:2.1rem">Paused</h1><div class="stack"><button id="go">Resume</button><button class="ghost" id="ex">Exit to menu</button></div><div class="note2">Esc also resumes. Changes apply right away.</div>'+sets();bindSets();B("go",resume);B("ex",exitGame)}
+if(p==="main")main(c);else if(p==="green")green(c);
+else if(p==="settings"){shell(c,"Settings",sets(),null,function(){go(UI.back||"main")});bindSets()}
+else if(p==="pause"){shell(c,"Paused",'<div class="stack"><button class="play" id="go">Resume</button><button class="ghost" id="ex">Exit to menu</button></div><div class="note2">Esc also resumes. Changes apply right away.</div>'+sets(),null,resume);bindSets();B("go",resume);B("ex",exitGame)}
 else if(p==="levels")levelsPage(c);else if(p==="board")boardPage(c);else if(p==="over")over1(c);else over2(c)}
-function main(c){
-c.innerHTML='<div class="logo">🌱</div><h1>Bloom</h1><p class="tag" style="margin-bottom:8px">Grow the tallest flower in the garden.</p><div class="seed">🌰 '+SV.seeds+' seeds · '+FL[SV.sel].n+'</div>'+
-'<details class="how"><summary>How to play</summary><div class="r"><span class="i">💧</span><div><b>Catch water and sun</b>Faster growth. Rare power-ups: 🧪 ☂️ 🐞 🧲</div></div><div class="r"><span class="i">🍃</span><div><b>Leaf shield</b>Space, ↑ or the leaf button blocks a hit</div></div><div class="r"><span class="i">⛈️</span><div><b>Storms and hail</b>Lightning marks its spot first</div></div><div class="r"><span class="i">✂️</span><div><b>Gardeners and birds</b>Leave the warning ring in time</div></div><div class="r"><span class="i">🌿</span><div><b>Vines, frost and thirst</b>Use the gaps, avoid frost, stay watered</div></div></details>'+
-mh()+'<button id="go" style="width:100%">'+(CFG.kind==="lvl"&&!CFG.two?"Choose a level":"Plant the seed")+'</button><div class="row3"><button class="ghost" id="dl">📅 Daily</button><button class="ghost" id="lb">🏅 Leaderboard</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="st">⚙️ Settings</button></div>'+
-'<div class="hint">'+(CFG.two?"Player 1: A / D, W to shield · Player 2: ← / →, ↑ to shield":"Arrow keys, A / D or drag to steer")+' · Esc to pause</div>';
+function main(c){var F=FL[SV.sel],mp=MAPS[SV.map];
+c.innerHTML='<div class="cb"><div class="logo float">🌱</div><h1>Bloom</h1><p class="tag">Grow the tallest flower in the garden.</p><div class="chips"><span class="chip">🌰 '+SV.seeds+' seeds</span><span class="chip">'+F.n+'</span><span class="chip">'+ICON[SV.map]+' '+mp.n+'</span></div>'+mh()+
+'<details class="how"><summary>How to play</summary><div class="r"><span class="i">💧</span><div><b>Catch water and sun</b>Faster growth. Rare power-ups: 🧪 ☂️ 🐞 🧲</div></div><div class="r"><span class="i">🍃</span><div><b>Leaf shield</b>Space, ↑ or the leaf button blocks a hit</div></div><div class="r"><span class="i">⛈️</span><div><b>Storms and hail</b>Lightning marks its spot first</div></div><div class="r"><span class="i">✂️</span><div><b>Gardeners and birds</b>Leave the warning ring in time</div></div><div class="r"><span class="i">🪐</span><div><b>Planets</b>Unlock Mars and Outer Space in the Greenhouse</div></div></details></div>'+
+'<div class="cf"><button class="play" id="go">'+(CFG.kind==="lvl"&&!CFG.two?"Choose a level":"Plant the seed")+'</button><div class="navr"><button id="dl"><b>📅</b>Daily</button><button id="lb"><b>🏅</b>Board</button><button id="gh"><b>🏡</b>Greenhouse</button><button id="st"><b>⚙️</b>Settings</button></div><div class="hint">'+(CFG.two?"P1: A / D, W shield · P2: ← / →, ↑ shield":"Arrow keys, A / D or drag · Space shield")+' · Esc pause</div></div>';
 B("go",function(){if(CFG.kind==="lvl"&&!CFG.two)go("levels");else start(false)});B("dl",function(){start(true)});B("lb",function(){go("board")});B("gh",function(){go("green")});B("st",function(){go("settings","main")});bindModes()}
-function green(c){var h='<div class="logo">🏡</div><h1 style="font-size:2rem">Greenhouse</h1><div class="seed">🌰 '+SV.seeds+' seeds</div><div class="sec">Characters</div>';
-Object.keys(FL).forEach(function(k){var f=FL[k],own=SV.own[k],sel=SV.sel===k;h+='<div class="fc'+(sel?" on":"")+'"><span class="sw" style="background:linear-gradient(135deg,'+f.c[0]+','+f.c[1]+')"></span><span class="fi"><b>'+f.n+'</b><small>'+f.d+'</small></span><button class="sm" data-f="'+k+'"'+(!own&&SV.seeds<f.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+f.cost)+'</button></div>'});
-h+='<div class="sec">Maps <small>for Infinite mode</small></div>';
-Object.keys(MAPS).forEach(function(k){var m2=MAPS[k],own=SV.mapOwn[k],sel=SV.map===k;h+='<div class="fc'+(sel?" on":"")+'"><span class="sw" style="background:linear-gradient(135deg,rgb('+m2.hill[0]+'),rgb('+m2.hill[1]+'))"></span><span class="fi"><b>'+m2.n+'</b><small>'+m2.d+'</small></span><button class="sm" data-m2="'+k+'"'+(!own&&SV.seeds<m2.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+m2.cost)+'</button></div>'});
-h+='<div class="sec">Upgrades <small>solo and daily only</small></div>';
-Object.keys(UP).forEach(function(k){var u=UP[k],l=SV.up[k],mx=l>=u.max,cost=u.cost(l),pp="";for(var i=0;i<u.max;i++)pp+=i<l?"●":"○";h+='<div class="fc"><span class="fi"><b>'+u.n+' <span class="pips">'+pp+'</span></b><small>'+u.d+'</small></span><button class="sm" data-u="'+k+'"'+(mx||SV.seeds<cost?" disabled":"")+'>'+(mx?"Max":"🌰 "+cost)+'</button></div>'});
-h+='<div class="note2">Earn seeds by growing tall, catching pickups and near misses.</div><button class="ghost" id="bk" style="width:100%">Back</button>';
-c.innerHTML=h;
+var GT="chars";
+function green(c){var h=seg([["chars","Characters"],["maps","Maps"],["ups","Upgrades"]],"t",GT);
+if(GT==="chars"){h+='<div class="grid2">'+Object.keys(FL).map(function(k){var f=FL[k],own=SV.own[k],sel=SV.sel===k;return '<div class="gc'+(sel?" on":"")+'">'+flowerSvg(f,62)+'<b>'+f.n+'</b><small>'+f.d+'</small><button class="sm" data-f="'+k+'"'+(!own&&SV.seeds<f.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+f.cost)+'</button></div>'}).join("")+'</div>'}
+else if(GT==="maps"){h+='<div class="grid2">'+Object.keys(MAPS).map(function(k){var m2=MAPS[k],own=SV.mapOwn[k],sel=SV.map===k;return '<div class="gc'+(sel?" on":"")+'"><div class="mi" style="background:linear-gradient(160deg,rgb('+m2.hill[0]+'),rgb('+m2.hill[1]+'))">'+ICON[k]+'</div><b>'+m2.n+'</b><small>'+m2.d+'</small><button class="sm" data-m2="'+k+'"'+(!own&&SV.seeds<m2.cost?" disabled":"")+'>'+(sel?"Selected":own?"Select":"🌰 "+m2.cost)+'</button></div>'}).join("")+'</div><div class="note2">Maps apply to Infinite mode. Levels use their own.</div>'}
+else{h+='<div class="note2" style="margin-top:0">Upgrades apply to solo and daily runs.</div>'+Object.keys(UP).map(function(k){var u=UP[k],l=SV.up[k],mx=l>=u.max,cost=u.cost(l),pp="";for(var i=0;i<u.max;i++)pp+=i<l?"●":"○";return '<div class="fc"><span class="fi"><b>'+u.n+' <span class="pips">'+pp+'</span></b><small>'+u.d+'</small></span><button class="sm" data-u="'+k+'"'+(mx||SV.seeds<cost?" disabled":"")+'>'+(mx?"Max":"🌰 "+cost)+'</button></div>'}).join("")+'<div class="note2">Earn seeds by growing tall, catching pickups and near misses.</div>'}
+shell(c,"Greenhouse",h);
+[].forEach.call(c.querySelectorAll("[data-t]"),function(b){b.onclick=function(){GT=b.dataset.t;green(c)}});
 [].forEach.call(c.querySelectorAll("[data-f]"),function(b){b.onclick=function(){var k=b.dataset.f,f=FL[k];if(!SV.own[k]&&SV.seeds>=f.cost){SV.seeds-=f.cost;SV.own[k]=1}if(SV.own[k])SV.sel=k;saveSv();green(c)}});
-[].forEach.call(c.querySelectorAll("[data-u]"),function(b){b.onclick=function(){var k=b.dataset.u,u=UP[k],l=SV.up[k],cost=u.cost(l);if(l<u.max&&SV.seeds>=cost){SV.seeds-=cost;SV.up[k]=l+1;saveSv()}green(c)}});
 [].forEach.call(c.querySelectorAll("[data-m2]"),function(b){b.onclick=function(){var k=b.dataset.m2,m2=MAPS[k];if(!SV.mapOwn[k]&&SV.seeds>=m2.cost){SV.seeds-=m2.cost;SV.mapOwn[k]=1}if(SV.mapOwn[k])SV.map=k;saveSv();green(c)}});
-B("bk",function(){go("main")})}
-function levelsPage(c){var h='<div class="logo">🗺️</div><h1 style="font-size:2rem">Levels</h1><p class="tag">Difficulty: '+CFG.mode+' · reach each goal height</p>';
-LEVELS.forEach(function(L,i){var n=i+1,un=n===1||SV.lv[n-1]>0,st=SV.lv[n]||0;h+='<div class="fc"><span class="fi"><b>'+n+'. '+L.n+'</b><small>'+MAPS[L.map].n+' · goal '+L.tgt+' cm · '+(st?"★".repeat(st)+"☆".repeat(3-st):un?"not cleared":"locked")+'</small></span><button class="sm" data-l="'+n+'"'+(un?"":" disabled")+'>'+(un?"Play":"🔒")+'</button></div>'});
-h+='<button class="ghost" id="bk" style="width:100%;margin-top:8px">Back</button>';c.innerHTML=h;[].forEach.call(c.querySelectorAll("[data-l]"),function(b){b.onclick=function(){start(false,+b.dataset.l)}});B("bk",function(){go("main")})}
+[].forEach.call(c.querySelectorAll("[data-u]"),function(b){b.onclick=function(){var k=b.dataset.u,u=UP[k],l=SV.up[k],cost=u.cost(l);if(l<u.max&&SV.seeds>=cost){SV.seeds-=cost;SV.up[k]=l+1;saveSv()}green(c)}})}
+function levelsPage(c){var h='<p class="tag" style="margin-bottom:10px">Difficulty: '+CFG.mode+' · reach each goal height</p><div class="lg">'+LEVELS.map(function(L,i){var n=i+1,un=n===1||SV.lv[n-1]>0,st=SV.lv[n]||0;return '<button class="lt'+(un?"":" lock")+'" data-l="'+n+'"'+(un?"":" disabled")+'><span class="ln">'+(un?n:"🔒")+'</span><b>'+L.n+'</b><small>'+ICON[L.map]+' goal '+L.tgt+' cm</small><span class="ls">'+(st?"★".repeat(st)+"☆".repeat(3-st):"☆☆☆")+'</span></button>'}).join("")+'</div>';
+shell(c,"Levels",h);[].forEach.call(c.querySelectorAll("[data-l]"),function(b){b.onclick=function(){start(false,+b.dataset.l)}})}
 var BT="inf-medium";
-function boardPage(c){var tabs=[["inf-easy","Easy"],["inf-medium","Medium"],["inf-hard","Hard"],["daily-"+dkey(),"Daily"]],l=SV.lb[BT]||[],h='<div class="logo">🏅</div><h1 style="font-size:2rem">Leaderboard</h1><div class="note2">Saved on this device. Infinite runs and the daily garden count.</div><div class="row2"><input class="inp" id="nm" maxlength="14" placeholder="Your name" value="'+cl(SV.name)+'"><button class="sm" id="sv">Save</button></div><div class="modes">'+tabs.map(function(t){return '<button class="mb'+(BT===t[0]?" on":"")+'" data-bt="'+t[0]+'">'+t[1]+'</button>'}).join("")+'</div>';
-h+=l.length?l.map(function(e,i){return '<div class="fc"><span class="fi"><b>#'+(i+1)+' '+cl(e.n)+'</b><small>'+new Date(e.d).toLocaleDateString()+'</small></span><b>'+(+e.c||0)+' cm</b></div>'}).join(""):'<div class="note2">No runs here yet. Go grow something tall!</div>';
-h+='<button class="ghost" id="bk" style="width:100%;margin-top:8px">Back</button>';c.innerHTML=h;
+function boardPage(c){var tabs=[["inf-easy","Easy"],["inf-medium","Medium"],["inf-hard","Hard"],["daily-"+dkey(),"Daily"]],l=SV.lb[BT]||[],med=["🥇","🥈","🥉"],h='<div class="note2" style="margin-top:0">Saved on this device. Infinite runs and the daily garden count.</div><div class="row2"><input class="inp" id="nm" maxlength="14" placeholder="Your name" value="'+cl(SV.name)+'"><button class="sm" id="sv">Save</button></div>'+seg(tabs,"bt",BT);
+h+=l.length?l.map(function(e,i){return '<div class="fc'+(i<3?" top":"")+'"><span class="md">'+(med[i]||"#"+(i+1))+'</span><span class="fi"><b>'+cl(e.n)+'</b><small>'+new Date(e.d).toLocaleDateString()+'</small></span><b>'+(+e.c||0)+' cm</b></div>'}).join(""):'<div class="note2" style="text-align:center;padding:16px 0">No runs here yet. Go grow something tall!</div>';
+shell(c,"Leaderboard",h);
 B("sv",function(){SV.name=cl($("nm").value);saveSv();$("sv").textContent="Saved ✓"});
-[].forEach.call(c.querySelectorAll("[data-bt]"),function(b){b.onclick=function(){BT=b.dataset.bt;boardPage(c)}});B("bk",function(){go("main")})}
+[].forEach.call(c.querySelectorAll("[data-bt]"),function(b){b.onclick=function(){BT=b.dataset.bt;boardPage(c)}})}
 function overL(c){var L=LEVELS[UI.lvl-1],w=g1.won(),st=g1.stars(),sd=g1.seeds(),a=Math.floor(g1.top()/8),nx=UI.lvl<LEVELS.length;
-c.innerHTML='<div class="logo">'+(w?"🌸":"🥀")+'</div><div class="tag" style="margin:0">Level '+UI.lvl+' · '+L.n+'</div><div class="big" style="font-size:2.4rem">'+(w?"Level complete!":"Wilted at "+a+" cm")+'</div>'+(w?'<div class="big" style="font-size:2rem">'+"★".repeat(st)+"☆".repeat(3-st)+'</div>':'<div class="tag">Goal: '+L.tgt+' cm</div>')+(sd?'<div class="seed">+'+sd+' 🌰 seeds</div>':'')+'<div class="stack"><button id="go">'+(w&&nx?"Next level":"Retry")+'</button>'+(w&&nx?'<button class="ghost" id="rt2">Retry</button>':'')+'<button class="ghost" id="lv">All levels</button><button class="ghost" id="mn">Main menu</button></div>';
-B("go",function(){start(false,w&&nx?UI.lvl+1:UI.lvl)});B("rt2",function(){start(false,UI.lvl)});B("lv",function(){go("levels")});B("mn",function(){go("main")})}
+c.innerHTML='<div class="cb"><div class="logo">'+(w?"🌸":"🥀")+'</div><div class="tag" style="margin:0">Level '+UI.lvl+' · '+L.n+'</div><div class="big" style="font-size:2.4rem">'+(w?"Level complete!":"Wilted at "+a+" cm")+'</div>'+(w?'<div class="big" style="font-size:2rem;color:#f5a524">'+"★".repeat(st)+"☆".repeat(3-st)+'</div>':'<div class="tag">Goal: '+L.tgt+' cm</div>')+'<div class="stats"><div class="st"><b>'+a+'</b><small>cm reached</small></div><div class="st"><b>+'+sd+'</b><small>🌰 seeds</small></div><div class="st"><b>'+SV.seeds+'</b><small>seeds total</small></div></div></div><div class="cf"><button class="play" id="go">'+(w&&nx?"Next level":"Retry")+'</button><div class="navr2">'+(w&&nx?'<button class="ghost" id="rt2">Retry</button>':'<button class="ghost" id="gh">🏡 Greenhouse</button>')+'<button class="ghost" id="lv">All levels</button></div></div>';
+B("go",function(){start(false,w&&nx?UI.lvl+1:UI.lvl)});B("rt2",function(){start(false,UI.lvl)});B("gh",function(){go("green")});B("lv",function(){go("levels")})}
 function over1(c){if(UI.lvl){overL(c);return}var a=Math.floor(g1.top()/8),sd=g1.seeds(),rk=g1.rk();
-c.innerHTML='<div class="logo">'+(g1.nb()?"🏆":"🥀")+'</div><div class="tag" style="margin:0">'+(UI.daily?"Daily garden · ":"")+'You reached</div><div class="big">'+a+' cm</div><div class="tag">'+rank(a)+(g1.nb()?" · New best!":"")+'</div>'+(rk?'<div class="seed">🏅 #'+rk+' on the leaderboard</div> ':'')+(sd?'<div class="seed">+'+sd+' 🌰 seeds · '+SV.seeds+' total</div>':'')+'<div class="stack"><button id="go">'+(UI.daily?"Retry daily":"Grow again")+'</button><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="mn">Main menu</button></div>';
+c.innerHTML='<div class="cb"><div class="logo">'+(g1.nb()?"🏆":"🥀")+'</div><div class="tag" style="margin:0">'+(UI.daily?"Daily garden":"Run complete")+'</div><div class="big">'+a+' cm</div><div class="tag">'+rank(a)+(g1.nb()?" · New best!":"")+'</div><div class="stats"><div class="st"><b>'+(rk?"#"+rk:"–")+'</b><small>🏅 leaderboard</small></div><div class="st"><b>+'+sd+'</b><small>🌰 seeds</small></div><div class="st"><b>'+SV.seeds+'</b><small>seeds total</small></div></div></div><div class="cf"><button class="play" id="go">'+(UI.daily?"Retry daily":"Grow again")+'</button><div class="navr2"><button class="ghost" id="gh">🏡 Greenhouse</button><button class="ghost" id="mn">Main menu</button></div></div>';
 B("go",function(){start(UI.daily)});B("gh",function(){go("green")});B("mn",function(){go("main")})}
 function over2(c){var a=Math.floor(g1.top()/8),b=Math.floor(g2.top()/8),w=a===b?0:a>b?1:2;
-c.innerHTML='<div class="logo">🏆</div><div class="big" style="font-size:2.4rem">'+(w?"Player "+w+" wins!":"It’s a tie!")+'</div><div class="vs"><div'+(w===1?' class="w"':'')+'>Player 1<b>'+a+' cm</b></div><div'+(w===2?' class="w"':'')+'>Player 2<b>'+b+' cm</b></div></div><div class="stack"><button id="go">Race again</button><button class="ghost" id="mn">Main menu</button></div>';
-B("go",function(){start(false)});B("mn",function(){go("main")})}
+c.innerHTML='<div class="cb"><div class="logo">🏆</div><div class="big" style="font-size:2.4rem">'+(w?"Player "+w+" wins!":"It’s a tie!")+'</div><div class="vs"><div'+(w===1?' class="w"':'')+'>Player 1<b>'+a+' cm</b></div><div'+(w===2?' class="w"':'')+'>Player 2<b>'+b+' cm</b></div></div></div><div class="cf"><button class="play" id="go">Race again</button><div class="navr2"><button class="ghost" id="mn">Main menu</button><button class="ghost" id="st">⚙️ Settings</button></div></div>';
+B("go",function(){start(false)});B("mn",function(){go("main")});B("st",function(){go("settings","main")})}
 function start(daily,lvl){
 au();blur();UI.daily=daily;UI.lvl=lvl||0;
 var two=!!CFG.two&&!daily&&!lvl,seed=daily?dseed():Math.floor(Math.random()*1e9);
